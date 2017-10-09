@@ -1,5 +1,6 @@
 # PYPI
 .pypirc
+MANIFEST
 
 # MacOS
 .DS_Store
