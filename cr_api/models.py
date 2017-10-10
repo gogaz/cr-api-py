@@ -1,6 +1,14 @@
+# -*- coding: utf-8 -*-
+
 """
 Clash Royale models.
 """
+
+from json import dumps, loads
+from logging import getLogger
+
+__timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
+__logs__ = getLogger(__package__)
 
 class SCTag:
     """SuperCell tags."""
@@ -54,8 +62,180 @@ class SCTag:
             ))
 
 
-class CRPlayerModel:
-    """Clash Royale player model."""
+
+class CRBaseModel(object):
+    """Clash Royale base model."""
+
+    def __init__(self, json=None):
+        self._cr_api_url = 'http://api.cr-api.com'
+        if json is not None:
+            self._uniq = json.get('url', None)
+        self._json_data = json
+        self._update_attributes(json)
+
+    def _update_attributes(self, json):
+        pass
+
+    def __getattr__(self, attribute):
+        """Proxy acess to stored JSON."""
+        if attribute not in self._json_data:
+            raise AttributeError(attribute)
+        value = self._json_data.get(attribute)
+        setattr(self, attribute, value)
+        return value
+
+    def as_dict(self):
+        """Return the attributes for this object as a dictionary.
+
+        This is equivalent to calling:
+
+            json.loads(obj.as_json())
+
+        :returns: this object’s attributes seriaized as a dictionary
+        :rtype: dict
+        """
+        return self._json_data
+
+    def as_json(self):
+        """Return the json data for this object.
+
+        This is equivalent to calling:
+
+            json.dumps(obj.as_dict())
+
+        :returns: this object’s attributes as a JSON string
+        :rtype: str
+        """
+        return dumps(self._json_data)
+
+    @classmethod
+    def _get_attribute(cls, data, attribute, fallback=None):
+        """Return the attribute from the JSON data.
+
+        :param dict data: dictionary used to put together the model
+        :param str attribute: key of the attribute
+        :param any fallback: return value if original return value is falsy
+        :returns: value paried with key in dict, fallback
+        """
+        if data is None or not isinstance(data, dict):
+            return None
+        result = data.get(attribute)
+        if result is None:
+            return fallback
+        return result
+
+    @classmethod
+    def __class_attribute(cls, data, attribute, cl, *args, **kwargs):
+        """Return the attribute from the JSON data and instantiate the class.
+
+        "param dict data: dictionary used to put together the model or None
+        "param str attribute: key of the attribute
+        :param class cl: class that will be instantiated
+        :returns: instantiated class or None
+        :rtype: object or None
+        """
+        value = cls._get_attribute(data, attribute)
+        if value:
+            return cl(
+                value,
+                *args,
+                **kwargs
+            )
+        return value
+
+    def __repr__(self):
+        repr_string = self._repr()
+        return repr_string
+
+    @classmethod
+    def from_dict(cls, json_dict):
+        """Return an instanc of this class formed from ``json_dict``."""
+        return cls(json_dict)
+
+    @classmethod
+    def from_json(cls, json):
+        """Return an instane of this class formed from ``json``."""
+        return cls(loads(json))
+
+    def __eq__(self, other):
+        return self._uniq == other._uniq
+
+    def __ne__(self, other):
+        return self._uniq != other._uniq
+
+
+class CRPlayerModel(CRBaseModel):
+    """A player profile in Clash Royale."""
+
+    def _update_attributes(self, player):
+        #: Unique player tag.
+        self.tag = self._get_attribute(player, 'tag')
+
+        #: In-game name, aka username
+        self.name = self._get_attribute(player, 'name')
+
+        #: Current trophies
+        self.trophies = self._get_attribute(player, 'trophies')
+
+        #: Experience
+        self.experience = self._get_attribute(player, 'experience')
+
+        if self.experience:
+            #: Level
+            self.level = self.experience.get('level')
+
+            #: XP level
+            self.xp = self.experience.get('xp')
+
+            #: Total XP
+            self.xp_total = self.experience.get('xpRequiredForLevelUp')
+
+            #: Experience as current / total
+            current = 'MAX'
+            total = 'MAX'
+            if isinstance(self.xp_total, int):
+                current = '{:,}'.format(self.xp)
+                total = '{:,}'.format(self.xp_total)
+            self.xp_str = '{} / {}'.format(current, total)
+
+        #: Clan
+        self.clan = self._get_attribute(player, 'clan')
+
+        #: Not in clan
+        self.not_in_clan = self.clan is None
+
+        #: Clan name
+        self.clan_name = 'No Clan'
+
+        #: Clan tag
+        self.clan_tag = None
+
+        #: Clan role
+        self.clan_role = 'N/A'
+
+        if self.clan:
+            self.clan_name = self.clan.get('name')
+            self.clan_tag = self.clan.get('tag')
+            self.clan_role = self.clan.get('role')
+
+        #: Clan badge URL
+        if self.not_in_clan:
+            self.clan_badge_url = "http://smlbiobot.github.io/img/emblems/NoClan.png"
+        else:
+            self.badge = self.clan.get('badge')
+            if self.badge:
+                self.badge_url = self.badge.get('url')
+            if self.badge_url:
+                self.clan_badge_url = 'http://api.cr-api.com' + self.badge_url
+
+
+
+
+class LegacyCRPlayerModel:
+    """Clash Royale player model.
+
+    TODO: Remove legacy model.
+    """
 
     def __init__(self, is_cache=False, data=None, chests=None):
         """Init."""
