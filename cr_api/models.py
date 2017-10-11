@@ -177,27 +177,13 @@ class CRPlayerModel(CRBaseModel):
         #: Current trophies
         self.trophies = self._get_attribute(player, 'trophies')
 
-        #: Experience
-        self.experience = self._get_attribute(player, 'experience')
+        #: name change option
+        self.name_changed = self._get_attribute(player, 'nameChanged')
 
-        if self.experience:
-            #: Level
-            self.level = self.experience.get('level')
+        #: global rank
+        self.global_rank = self._get_attribute(player, 'globalRank')
 
-            #: XP level
-            self.xp = self.experience.get('xp')
-
-            #: Total XP
-            self.xp_total = self.experience.get('xpRequiredForLevelUp')
-
-            #: Experience as current / total
-            current = 'MAX'
-            total = 'MAX'
-            if isinstance(self.xp_total, int):
-                current = '{:,}'.format(self.xp)
-                total = '{:,}'.format(self.xp_total)
-            self.xp_str = '{} / {}'.format(current, total)
-
+        #: ----------
         #: Clan
         self.clan = self._get_attribute(player, 'clan')
 
@@ -228,6 +214,140 @@ class CRPlayerModel(CRBaseModel):
             if self.badge_url:
                 self.clan_badge_url = 'http://api.cr-api.com' + self.badge_url
 
+        #: ----------
+        #: Experience
+        self.experience = self._get_attribute(player, 'experience')
+
+        if self.experience:
+            #: Level
+            self.level = self.experience.get('level')
+
+            #: XP level
+            self.xp = self.experience.get('xp')
+
+            #: Total XP
+            self.xp_total = self.experience.get('xpRequiredForLevelUp')
+
+            #: Experience as current / total
+            current = 'MAX'
+            total = 'MAX'
+            if isinstance(self.xp_total, int):
+                current = '{:,}'.format(self.xp)
+                total = '{:,}'.format(self.xp_total)
+            self.xp_str = '{} / {}'.format(current, total)
+
+        #: ----------
+        #: Stats
+        self.stats = self._get_attribute(player, 'stats')
+
+        #: Legendary trophies
+        self.trophy_legendary = 0
+
+        #: Highest trophies (personal best)
+        self.trophy_highest = 0
+
+        #: Current trophies
+        self.trophy_current = self.trophies
+
+        #: Tournament cards won
+        self.tourney_cards_won = 0
+
+        #: Three crown  wins
+        self.three_crown_wins = 0
+
+        #: Cards found
+        self.cards_found = 0
+
+        #: Favorite Card
+        self.favorite_card = None
+
+        #: Total donations
+        self.total_donations = 0
+
+        #: challenge max wins
+        self.challenge_max_wins = 0
+
+        #: challenge cards won
+        self.challenge_cards_won = 0
+
+        #: level
+        self.stats_level = 0
+
+        if self.stats:
+            self.trophy_legendary = self.stats.get('legendaryTrophies')
+            self.trophy_highest = self.stats.get('maxTrophies')
+            self.tourney_cards_won = self.stats.get('tournamentCardsWon')
+            self.three_crown_wins = self.stats.get('threeCrownWins')
+            self.cards_found = self.stats.get('cardsFound')
+            self.favorite_card = self.stats.get('favoriteCard')
+            self.total_donations = self.stats.get('totalDonations')
+            self.challenge_max_wins = self.stats.get('challengeMaxWins')
+            self.challenge_cards_won = self.stats.get('challengeCardsWon')
+            self.stats_level = self.stats.get('level')
+
+        #: ----------
+        #: Games
+        self.games = self._get_attribute(player, 'games')
+
+        #: total games
+        self.total_games = 0
+
+        #: tournament games
+        self.tournament_games = 0
+
+        #: wins
+        self.wins = 0
+
+        #: losses
+        self.losses = 0
+
+        #: draws
+        self.draws = 0
+
+        #: win streak
+        self.win_streak = 0
+
+        if self.games:
+            self.total_games = self.games.get('total')
+            self.tournament_games = self.games.get('tournamentGames')
+            self.wins = self.games.get('wins')
+            self.losses = self.games.get('losses')
+            self.draws = self.games.get('draws')
+            self.win_streak = max(0, self.games.get('currentWinStreak', 0))
+
+        #: ----------
+        #: Chests
+        self.chest_cycle = self._get_attribute(player, 'chestCycle')
+
+        if self.chest_cycle:
+            self.chest_position = self.chest_cycle.get('position')
+            self.chest_super_magical_position = self.chest_cycle.get('superMagicalPos')
+            self.chest_legendary_position = self.chest_cycle.get('legendaryPos')
+            self.chest_epic_position = self.chest_cycle.get('epicPos')
+
+        self.chests_opened = self.chest_position
+
+        #: ----------
+        #: Shop offers
+        self.shop_offers = self._get_attribute(player, 'shopOffers')
+
+        #: legendary offer
+        self.shop_offers_legendary = None
+
+        #: epic offer
+        self.shop_offers_epic = None
+
+        #: arena offer
+        self.shop_offers_arena = None
+
+        if self.shop_offers:
+            self.shop_offers_legendary = self.shop_offers.get('legendary')
+            self.shop_offers_epic = self.shop_offers.get('epic')
+            self.shop_offers_arena = self.shop_offers.get('arena')
+
+        #: ----------
+        #: Deck
+        self.deck = self._get_attribute(player, 'currentDeck')
 
 
 
