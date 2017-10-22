@@ -22,6 +22,13 @@ class APITimeoutError(APIError):
 class APIClientResponseError(APIError):
     pass
 
+class APIURL:
+    """
+    API URL
+    """
+    clan = 'http://api.cr-api.com/clan/{}'
+    top_clans = 'http://api.cr-api.com/top/clans'
+    profile = 'http://api.cr-api.com/profile/{}'
 
 class Client:
     """
@@ -35,6 +42,10 @@ class Client:
 
         self.timeout = timeout
 
+        self.url = {
+            "clan": 'http://api.cr-api.com/clan/{}'
+        }
+
     async def fetch(self, url):
         """Fetch URL.
 
@@ -43,8 +54,8 @@ class Client:
         :return: Response in JSON
         """
         try:
-            with async_timeout.timeout(self.timeout):
-                async with self.session.get(url) as resp:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
                     if resp.status != 200:
                         raise APIError
                     return resp.json()
@@ -56,7 +67,7 @@ class Client:
     async def get_clan(self, clan_tag, include_members=True):
         """Fetch a single clan."""
         url = '{api_url}/{members}'.format(
-            api_url='http://api.cr-api.com/clan/{}'.format(clan_tag),
+            api_url=APIURL.clan.format(clan_tag),
             members='' if include_members else '?members=0'
         )
         print(url)
@@ -74,29 +85,31 @@ class Client:
         URL Format: http://api.cr-api.com/clan/28VVQPV9,Y8GYCGV/?members=0
         """
         url = '{api_url}/{tag_list}/{members}'.format(
-            api_url='http://api.cr-api.com/clan',
+            api_url=APIURL.clan,
             tag_list=','.join(clan_tags),
             members='' if include_members else '?members=0'
         )
-        print(url)
         data = await self.fetch(url)
         return data
 
     async def get_top_clans(self):
         """Fetch top clans."""
-        data = await self.fetch('http://api.cr-api.com/top/clans')
+        data = await self.fetch(APIURL.top_clans)
         return data
 
-    async def get_profile(self, tag):
-        """Fetch player from profile API."""
+    async def get_profile(self, tag: str) -> ProfileModel:
+        """Get player profile by tag.
+        :param tag: 
+        :return: 
+        """
         ptag = SCTag(tag).tag
-        url = '{}{}'.format(config.api.profile.url, ptag)
+        url = APIURL.profile.format(ptag)
         data = await self.fetch(url)
         return ProfileModel(json=data)
 
     async def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [SCTag(tag).tag for tag in tags]
-        url = '{}{}'.format(config.api.profile.url, ','.join(ptags))
+        url = APIURL.profile.format(','.join(ptags))
         data = await self.fetch(url)
-        return [ProfileModel(json=d) for d in data]
+        return [ProfileModel(json=d, url=url) for d in data]

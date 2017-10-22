@@ -66,10 +66,10 @@ class SCTag:
 class CRBaseModel(object):
     """Clash Royale base model."""
 
-    def __init__(self, json=None):
-        self._cr_api_url = 'http://api.cr-api.com'
-        if json is not None:
-            self._uniq = json.get('url', None)
+    def __init__(self, json=None, url=None):
+        # self._cr_api_url = 'http://api.cr-api.com'
+        if url is not None:
+            self._uniq = url
         self._json_data = json
         self._update_attributes(json)
 
@@ -318,6 +318,10 @@ class ProfileModel(CRBaseModel):
         #: ----------
         #: Chests
         self.chest_cycle = self._get_attribute(player, 'chestCycle')
+        self.chest_position = 0
+        self.chest_super_magical_position = 0
+        self.chest_legendary_position = 0
+        self.chest_epic_position = 0
 
         if self.chest_cycle:
             self.chest_position = self.chest_cycle.get('position')
