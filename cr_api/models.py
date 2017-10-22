@@ -10,10 +10,11 @@ from logging import getLogger
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
+
 class SCTag:
     """SuperCell tags."""
 
-    TAG_CHARACTERS = list("0289PYLQGRJCUV")
+    TAG_CHARACTERS = "0289PYLQGRJCUV"
 
     def __init__(self, tag: str):
         """Init.
@@ -60,7 +61,6 @@ class SCTag:
                 ', '.join(self.invalid_chars),
                 ', '.join(self.TAG_CHARACTERS)
             ))
-
 
 
 class CRBaseModel(object):
@@ -164,7 +164,7 @@ class CRBaseModel(object):
         return self._uniq != other._uniq
 
 
-class CRPlayerModel(CRBaseModel):
+class ProfileModel(CRBaseModel):
     """A player profile in Clash Royale."""
 
     def _update_attributes(self, player):
