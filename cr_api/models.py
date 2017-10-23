@@ -11,7 +11,7 @@ __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
 
-class SCTag:
+class Tag:
     """SuperCell tags."""
 
     TAG_CHARACTERS = "0289PYLQGRJCUV"
@@ -63,24 +63,23 @@ class SCTag:
             ))
 
 
-class CRBaseModel(object):
+class BaseModel(object):
     """Clash Royale base model."""
 
-    def __init__(self, json=None, url=None):
-        # self._cr_api_url = 'http://api.cr-api.com'
+    def __init__(self, data=None, url=None):
         if url is not None:
             self._uniq = url
-        self._json_data = json
-        self._update_attributes(json)
+        self._data = data
+        self._update_attributes(data)
 
-    def _update_attributes(self, json):
+    def _update_attributes(self, data):
         pass
 
     def __getattr__(self, attribute):
         """Proxy acess to stored JSON."""
-        if attribute not in self._json_data:
+        if attribute not in self._data:
             raise AttributeError(attribute)
-        value = self._json_data.get(attribute)
+        value = self._data.get(attribute)
         setattr(self, attribute, value)
         return value
 
@@ -94,7 +93,7 @@ class CRBaseModel(object):
         :returns: this object’s attributes seriaized as a dictionary
         :rtype: dict
         """
-        return self._json_data
+        return self._data
 
     def as_json(self):
         """Return the json data for this object.
@@ -106,7 +105,7 @@ class CRBaseModel(object):
         :returns: this object’s attributes as a JSON string
         :rtype: str
         """
-        return dumps(self._json_data)
+        return dumps(self._data)
 
     @classmethod
     def _get_attribute(cls, data, attribute, fallback=None):
@@ -167,28 +166,66 @@ class CRBaseModel(object):
         return "{}({})".format(self.__class__, self.__dict__)
 
 
-class ProfileModel(CRBaseModel):
+class ProfileClan(BaseModel):
+    """Clan model inside a profile."""
+
+    def _update_attributes(self, data):
+        self.tag = self._get_attribute(data, 'tag')
+        self.name = self._get_attribute(data, 'name', 'No Clan')
+        self.role = self._get_attribute(data, 'role', 'N/A')
+        self.badge = Badge(data=self._get_attribute(data, 'badge'))
+
+
+class Card(BaseModel):
+    """Card."""
+
+    def _update_attributes(self, data):
+        self.name = self._get_attribute(data, 'name')
+        self.rarity = self._get_attribute(data, 'rarity')
+        self.level = self._get_attribute(data, 'level')
+        self.count = self._get_attribute(data, 'count')
+        self.required_for_upgrade = self._get_attribute(data, 'requiredForUpgrade')
+        self.card_id = self._get_attribute(data, 'card_id')
+        self.key = self._get_attribute(data, 'key')
+        self.card_key = self._get_attribute(data, 'card_key')
+        self.elixir = self._get_attribute(data, 'elixir')
+        self.type = self._get_attribute(data, 'type')
+        self.arena = self._get_attribute(data, 'arena')
+        self.description = self._get_attribute(data, 'description')
+        self.decklink = self._get_attribute(data, 'decklink')
+        self.left_to_upgrade = self._get_attribute(data, 'leftToUpgrade')
+
+
+class Deck(BaseModel):
+    """Deck with cards."""
+
+    def _update_attributes(self, data):
+        self.cards = [Card(data=c) for c in data]
+
+
+class Profile(BaseModel):
     """A player profile in Clash Royale."""
 
-    def _update_attributes(self, player):
+    def _update_attributes(self, data):
         #: Unique player tag.
-        self.tag = self._get_attribute(player, 'tag')
+        self.tag = self._get_attribute(data, 'tag')
 
         #: In-game name, aka username
-        self.name = self._get_attribute(player, 'name')
+        self.name = self._get_attribute(data, 'name')
 
         #: Current trophies
-        self.trophies = self._get_attribute(player, 'trophies')
+        self.trophies = self._get_attribute(data, 'trophies')
 
         #: name change option
-        self.name_changed = self._get_attribute(player, 'nameChanged')
+        self.name_changed = self._get_attribute(data, 'nameChanged')
 
         #: global rank
-        self.global_rank = self._get_attribute(player, 'globalRank')
+        self.global_rank = self._get_attribute(data, 'globalRank')
 
         #: ----------
         #: Clan
-        self.clan = self._get_attribute(player, 'clan')
+        # self.clan = self._get_attribute(player, 'clan')
+        self.clan = Clan(data=self._get_attribute(data, 'clan'))
 
         #: Not in clan
         self.not_in_clan = self.clan is None
@@ -202,24 +239,24 @@ class ProfileModel(CRBaseModel):
         #: Clan role
         self.clan_role = 'N/A'
 
-        if self.clan:
-            self.clan_name = self.clan.get('name')
-            self.clan_tag = self.clan.get('tag')
-            self.clan_role = self.clan.get('role')
+        self.clan_name = self.clan.name
+        self.clan_tag = self.clan.tag
+        self.clan_role = self.clan.role
 
         #: Clan badge URL
-        if self.not_in_clan:
-            self.clan_badge_url = "http://smlbiobot.github.io/img/emblems/NoClan.png"
-        else:
-            self.badge = self.clan.get('badge')
-            if self.badge:
-                self.badge_url = self.badge.get('url')
-            if self.badge_url:
-                self.clan_badge_url = 'http://api.cr-api.com' + self.badge_url
+        # if self.not_in_clan:
+        #     self.clan_badge_url = "http://smlbiobot.github.io/img/emblems/NoClan.png"
+        # else:
+        #     self.badge = self.clan.get('badge')
+        #     if self.badge:
+        #         self.badge_url = self.badge.get('url')
+        #     if self.badge_url:
+        #         self.clan_badge_url = 'http://api.cr-api.com' + self.badge_url
+        self.badge = Badge(data=self._get_attribute(data, 'badge'))
 
         #: ----------
         #: Experience
-        self.experience = self._get_attribute(player, 'experience')
+        self.experience = self._get_attribute(data, 'experience')
 
         if self.experience:
             #: Level
@@ -241,7 +278,7 @@ class ProfileModel(CRBaseModel):
 
         #: ----------
         #: Stats
-        self.stats = self._get_attribute(player, 'stats')
+        self.stats = self._get_attribute(data, 'stats')
 
         #: Legendary trophies
         self.trophy_legendary = 0
@@ -290,7 +327,7 @@ class ProfileModel(CRBaseModel):
 
         #: ----------
         #: Games
-        self.games = self._get_attribute(player, 'games')
+        self.games = self._get_attribute(data, 'games')
 
         #: total games
         self.total_games = 0
@@ -320,7 +357,7 @@ class ProfileModel(CRBaseModel):
 
         #: ----------
         #: Chests
-        self.chest_cycle = self._get_attribute(player, 'chestCycle')
+        self.chest_cycle = self._get_attribute(data, 'chestCycle')
         self.chest_position = 0
         self.chest_super_magical_position = 0
         self.chest_legendary_position = 0
@@ -336,7 +373,7 @@ class ProfileModel(CRBaseModel):
 
         #: ----------
         #: Shop offers
-        self.shop_offers = self._get_attribute(player, 'shopOffers')
+        self.shop_offers = self._get_attribute(data, 'shopOffers')
 
         #: legendary offer
         self.shop_offers_legendary = None
@@ -354,618 +391,112 @@ class ProfileModel(CRBaseModel):
 
         #: ----------
         #: Deck
-        self.deck = self._get_attribute(player, 'currentDeck')
+        self.deck = Deck(data=self._get_attribute(data, 'currentDeck'))
 
 
+class Badge(BaseModel):
+    def _update_attributes(self, data):
+        # - url
+        self.url = self._get_attribute(data, 'url', 'http://smlbiobot.github.io/img/emblems/NoClan.png')
 
-class LegacyCRPlayerModel:
-    """Clash Royale player model.
+        # - filename
+        self.filename = self._get_attribute(data, 'filename')
 
-    TODO: Remove legacy model.
-    """
+        # - key
+        self.key = self._get_attribute(data, 'key')
 
-    def __init__(self, is_cache=False, data=None, chests=None):
-        """Init."""
-        self.data = data
-        self.is_cache = is_cache
-        self.chests = chests
 
-    @property
-    def tag(self):
-        """Player tag"""
-        return self.data.get("tag", None)
-
-    @property
-    def name(self):
-        """IGN."""
-        return self.data.get("name", None)
-
-    @property
-    def trophies(self):
-        """Trophies."""
-        return self.data.get("trophies", None)
-
-    @property
-    def experience(self):
-        """Experience."""
-        return self.data.get("experience", None)
-
-    @property
-    def level(self):
-        """XP Level."""
-        if self.experience is not None:
-            return self.experience.get("level", None)
-        return None
-
-    @property
-    def xp(self):
-        """XP Level."""
-        if self.experience is not None:
-            return self.experience.get("xp", 0)
-        return 0
-
-    @property
-    def xp_total(self):
-        """XP Level."""
-        if self.experience is not None:
-            return self.experience.get("xpRequiredForLevelUp", None)
-        return None
-
-    @property
-    def xp_str(self):
-        """Experience in current / total format."""
-        current = 'MAX'
-        total = 'MAX'
-        if isinstance(self.xp_total, int):
-            current = '{:,}'.format(self.xp)
-            total = '{:,}'.format(self.xp_total)
-        return '{} / {}'.format(current, total)
-
-    @property
-    def clan(self):
-        """Clan."""
-        return self.data.get("clan", None)
-
-    @property
-    def not_in_clan(self):
-        """Not in clan flag."""
-        return self.clan is None
-
-    @property
-    def clan_name(self):
-        """Clan name."""
-        if self.not_in_clan:
-            return "No Clan"
-        if self.clan is not None:
-            return self.clan.get("name", None)
-        return None
-
-    @property
-    def clan_tag(self):
-        """Clan tag."""
-        if self.clan is not None:
-            return self.clan.get("tag", None)
-        return None
-
-    @property
-    def clan_role(self):
-        """Clan role."""
-        if self.not_in_clan:
-            return "N/A"
-        if self.clan is not None:
-            return self.clan.get("role", None)
-        return None
-
-    @property
-    def clan_name_tag(self):
-        """Clan name and tag."""
-        return '{} #{}'.format(self.clan_name, self.clan_tag)
-
-    @property
-    def clan_badge_url(self):
-        """Clan badge url."""
-        if self.not_in_clan:
-            return "http://smlbiobot.github.io/img/emblems/NoClan.png"
-        try:
-            url = self.clan['badge']['url']
-            return 'http://api.cr-api.com' + url
-        except KeyError:
-            pass
-        return ''
-
-    @property
-    def stats(self):
-        """Stats."""
-        return self.data.get("stats", None)
-
-    @property
-    def challenge_cards_won(self):
-        """Challenge cards won."""
-        if self.stats is not None:
-            return self.stats.get("challengeCardsWon", 0)
-        return 0
-
-    @property
-    def tourney_cards_won(self):
-        """Challenge cards won."""
-        if self.stats is not None:
-            return self.stats.get("tournamentCardsWon", 0)
-        return 0
-
-    @property
-    def tourney_cards_per_game(self):
-        """Number of tournament cards won per game played."""
-        if self.tourney_games:
-            return self.tourney_cards_won / self.tourney_games
-        return None
-
-    @property
-    def challenge_max_wins(self):
-        """Max challenge wins."""
-        if self.stats is not None:
-            return self.stats.get("challengeMaxWins", 0)
-        return 0
-
-    @property
-    def total_donations(self):
-        """Total donations."""
-        if self.stats is not None:
-            return self.stats.get("totalDonations", 0)
-        return 0
-
-    @property
-    def cards_found(self):
-        """Cards found."""
-        if self.stats is not None:
-            return self.stats.get("cardsFound", 0)
-        return 0
-
-    @property
-    def favorite_card(self):
-        """Favorite card"""
-        """Cards found."""
-        if self.stats is not None:
-            return self.stats.get("favoriteCard", "soon")
-        return "soon"
-
-    @property
-    def trophy_current(self):
-        """Current trophies."""
-        return self.data.get("trophies", None)
-
-    @property
-    def trophy_highest(self):
-        """Personal best."""
-        if self.stats is not None:
-            return self.stats.get("maxTrophies", None)
-        return None
-
-    @property
-    def trophy_legendary(self):
-        """Legendary trophies."""
-        if self.stats is not None:
-            return self.stats.get("legendaryTrophies", None)
-        return None
-
-    def trophy_value(self, emoji):
-        """Trophy values.
-
-        Current / Highest (PB)
-        """
-        return '{} / {} PB {}'.format(
-            '{:,}'.format(self.trophy_current),
-            '{:,}'.format(self.trophy_highest),
-            emoji)
-
-    @property
-    def games(self):
-        """Game stats."""
-        return self.data.get("games", None)
-
-    @property
-    def tourney_games(self):
-        """Number of tournament games."""
-        if self.games is not None:
-            return self.games.get("tournamentGames", 0)
-        return 0
-
-    @property
-    def wins(self):
-        """Games won."""
-        if self.games is not None:
-            return self.games.get("wins", 0)
-        return 0
-
-    @property
-    def losses(self):
-        """Games won."""
-        if self.games is not None:
-            return self.games.get("losses", 0)
-        return 0
-
-    @property
-    def draws(self):
-        """Games won."""
-        if self.games is not None:
-            return self.games.get("draws", 0)
-        return 0
-
-    def win_draw_losses(self, emoji):
-        """Win / draw / losses."""
-        return '{} / {} / {} {}'.format(
-            '{:,}'.format(self.wins),
-            '{:,}'.format(self.draws),
-            '{:,}'.format(self.losses),
-            emoji
-        )
-
-    @property
-    def total_games(self):
-        """Total games played."""
-        if self.games is not None:
-            return self.games.get("total", 0)
-        return 0
-
-    @property
-    def win_streak(self):
-        """Win streak."""
-        streak = 0
-        if self.games is not None:
-            streak = self.games.get("currentWinStreak", 0)
-        return max(streak, 0)
-
-    @property
-    def three_crown_wins(self):
-        """Three crown wins."""
-        if self.games is not None:
-            return self.stats.get("threeCrownWins", 0)
-        return 0
-
-    @property
-    def rank(self):
-        """Global rank"""
-        return self.data.get("globalRank", None)
+class Region(BaseModel):
+    def _update_attributes(self, data):
+        # - region is a country
+        self.is_country = self._get_attribute(data, 'isCountry')
 
-    """
-    Chests.
-    """
+        # - name
+        self.name = self._get_attribute(data, 'name')
 
-    @property
-    def chest_cycle(self):
-        """Chest cycle."""
-        return self.data.get("chestCycle", None)
-
-    @property
-    def chest_cycle_position(self):
-        """Chest cycle position."""
-        if self.chest_cycle is not None:
-            return self.chest_cycle.get("position", None)
-        return None
-
-    def chest_by_position(self, pos):
-        """Return chest type based on position."""
-        if pos == self.chest_cycle.get("superMagicalPos"):
-            return "SuperMagical"
-        elif pos == self.chest_cycle.get("legendaryPos"):
-            return "Legendary"
-        elif pos == self.chest_cycle.get("epicPos"):
-            return "Epic"
-        return self.chests[pos % len(self.chests)]
-
-    def chests(self, count):
-        """Next n chests."""
-        if self.chest_cycle_position is not None:
-            return [self.chest_by_position(self.chest_cycle_position + i) for i in range(count)]
-        return []
-
-    def chest_index(self, key):
-        """Chest incdex by chest key."""
-        if self.chest_cycle is None:
-            return None
-        if self.chest_cycle_position is None:
-            return None
-        chest_pos = self.chest_cycle.get(key, None)
-        if chest_pos is None:
-            return None
-        return chest_pos - self.chest_cycle_position
-
-    @property
-    def chest_super_magical_index(self):
-        """Super magical index."""
-        return self.chest_index("superMagicalPos")
-
-    @property
-    def chest_legendary_index(self):
-        """Super magical index."""
-        return self.chest_index("legendaryPos")
-
-    @property
-    def chest_epic_index(self):
-        """Super magical index."""
-        return self.chest_index("epicPos")
-
-    def chest_first_index(self, key):
-        """First index of chest by key."""
-        if self.chests is not None:
-            pos = self.chest_cycle_position
-            if pos is not None:
-                start_pos = pos % len(self.chests)
-                chests = self.chests[start_pos:]
-                chests.extend(self.chests)
-                return chests.index(key)
-        return None
-
-    @property
-    def chest_magical_index(self):
-        """First index of magical chest"""
-        return self.chest_first_index('Magic')
-
-    @property
-    def chest_giant_index(self):
-        """First index of giant chest"""
-        return self.chest_first_index('Giant')
-
-    @property
-    def chests_opened(self):
-        """Number of chests opened."""
-        return self.chest_cycle_position
-
-    def shop_offers(self, name):
-        """Shop offers by name.
-
-        Valid names are: legendary, epic, arena.
-        """
-        offers = self.data.get("shopOffers")
-        return offers.get(name)
-
-    @property
-    def shop_offers_arena(self):
-        """Get epic shop offer."""
-        return self.shop_offers("arena")
-
-    @property
-    def shop_offers_epic(self):
-        """Get epic shop offer."""
-        return self.shop_offers("epic")
-
-    @property
-    def shop_offers_legendary(self):
-        """Get epic shop offer."""
-        return self.shop_offers("legendary")
-
-    @property
-    def win_ratio(self):
-        """Win ratio."""
-        return (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses)
-
-    @property
-    def arena(self):
-        """League. Can be either Arena or league."""
-        try:
-            return self.data["arena"]["arena"]
-        except KeyError:
-            return None
-
-    @property
-    def arena_text(self):
-        """Arena text."""
-        try:
-            return self.data["arena"]["name"]
-        except KeyError:
-            return None
-
-    @property
-    def arena_subtitle(self):
-        """Arena subtitle"""
-        try:
-            return self.data["arena"]["arena"]
-        except KeyError:
-            return None
-
-    @property
-    def arena_id(self):
-        """Arena ID."""
-        try:
-            return self.data["arena"]["arenaID"]
-        except KeyError:
-            return None
-
-    @property
-    def league(self):
-        """League (int)."""
-        league = max(self.arena_id - 11, 0)
-        return league
-
-    @property
-    def arena_url(self):
-        """Arena Icon URL."""
-        if self.league > 0:
-            url = 'http://smlbiobot.github.io/img/leagues/league{}.png'.format(self.league)
-        else:
-            url = 'http://smlbiobot.github.io/img/arenas/arena-{}.png'.format(self.arena.Arena)
-        return url
-
-    @property
-    def seasons(self):
-        """Season finishes."""
-        s_list = []
-        for s in self.data.get("previousSeasons"):
-            s_list.append({
-                "number": s.get("seasonNumber", None),
-                "highest": s.get("seasonHighest", None),
-                "ending": s.get("seasonEnding", None),
-                "rank": s.get("seasonEndGlobalRank", None)
-            })
-        s_list = sorted(s_list, key=lambda s: s["number"])
-        return s_list
-
-
-class CRClanMemberModel:
-    """Clash Royale clan member model."""
-
-    def __init__(self, data):
-        """Init.
-        """
-        self.data = data
-        self._discord_member_id = None
-        self._discord_member = None
-        self._clan_name = None
-        self._clan_tag = None
-
-    @property
-    def name(self):
-        """Name aka IGN."""
-        return self.data.get('name', None)
-
-    @property
-    def tag(self):
-        """Player tag."""
-        return self.data.get('tag', None)
-
-    @property
-    def score(self):
-        """Player trophies."""
-        return self.data.get('score', None)
-
-    @property
-    def donations(self):
-        """Donations."""
-        return self.data.get('donations', None)
 
-    @property
-    def clan_chest_crowns(self):
-        """Clan chest crowns"""
-        return self.data.get('clanChestCrowns', None)
-
-    @property
-    def arena(self):
-        """Arena object."""
-        return self.data.get('arena', None)
-
-    @property
-    def arena_str(self):
-        """Arena. eg: Arena 10: Hog Mountain"""
-        arena = self.data.get('arena', None)
-        if arena is not None:
-            return '{}: {}'.format(
-                arena.get('arena', ''),
-                arena.get('name', '')
-            )
-        return ''
+class ClanChest(BaseModel):
+    def _update_attributes(self, data):
+        # crowns
+        self.crowns = self._get_attribute(data, 'clanChestCrowns')
 
-    @property
-    def role(self):
-        """Role ID"""
-        return self.data.get('role', None)
+        # crown percent
+        self.crowns_percent = self._get_attribute(data, 'clanChestCrownsPercent')
 
-    @property
-    def exp_level(self):
-        """Experience level."""
-        return self.data.get('expLevel', None)
+        # crowns required
+        self.crowns_required = self._get_attribute(data, 'clanChestCrownsRequired')
 
-    @property
-    def discord_member(self):
-        """Discord user objedt."""
-        return self._discord_member
 
-    @discord_member.setter
-    def discord_member(self, value):
-        """Discord user  object."""
-        self._discord_member = value
+class Arena(BaseModel):
+    def _update_attributes(self, data):
+        self.image_url = self._get_attribute(data, 'imageURL')
+        self.arena = self._get_attribute(data, 'arena')
+        self.arena_id = self._get_attribute(data, 'arenaID')
+        self.name = self._get_attribute(data, 'name')
+        self.trophy_limit = self._get_attribute(data, 'trophyLimit')
 
-    @property
-    def discord_member_id(self):
-        """Discord user id."""
-        return self._discord_member_id
 
-    @discord_member_id.setter
-    def discord_member_id(self, value):
-        """Discord user id."""
-        self._discord_member_id = value
+class ClanMember(BaseModel):
+    """Member model in clan."""
 
-    @property
-    def mention(self):
-        """Discord mention."""
-        return self.discord_member.mention
+    def _update_attributes(self, data):
+        # - name
+        self.name = self._get_attribute(data, 'name')
 
-    @property
-    def role_name(self):
-        """Properly formatted role name."""
-        return self.data.get('roleName', None)
+        # - arena
+        self.arena = Arena(data=self._get_attribute(data, 'arena'))
 
-    def role_is(self, role_name):
-        """Return True if member has role"""
-        return self.role_name == role_name
+        # - experience level
+        self.experience_level = self._get_attribute(data, 'expLevel')
 
+        # - trophies
+        self.trophies = self._get_attribute(data, 'trophies')
 
-    @property
-    def role_is_member(self):
-        """Return True if member is Member."""
-        return self.role_is('Member')
+        # - score: alias to trophies
+        self.score = self._get_attribute(data, 'score')
 
-    @property
-    def role_is_elder(self):
-        """Return True if member is elder."""
-        return self.role_is('Elder')
+        # - donations for the week
+        self.donations = self._get_attribute(data, 'donations')
 
-    @property
-    def role_is_coleader(self):
-        """Return True if member is co-leader."""
-        return self.role_is('Co-Leader')
+        # - current rank
+        self.current_rank = self._get_attribute(data, 'currentRank')
 
-    @property
-    def role_is_leader(self):
-        """Return True if member is leader."""
-        return self.role_is('Leader')
+        # - previous rank
+        self.previous_rank = self._get_attribute(data, 'previousRank')
 
-    @property
-    def previousRank(self):
-        """Previous rank."""
-        return self.data.get('previousRank', 0)
+        # - clan chest crowns
+        self.clan_chestcrowns = self._get_attribute(data, 'clanChestCrowns')
 
-    @property
-    def currentRank(self):
-        """API has typo."""
-        return self.data.get('currentRank', 0)
+        # - player tag
+        self.tag = self._get_attribute(data, 'tag')
 
-    @property
-    def rank(self):
-        """Rank in clan with trend.
+        # - role: enum
+        self.role = self._get_attribute(data, 'role')
 
-        Rank diffis in reverse because lower is better.
-        Previous rank is 0 when user is new to the clan.
+        # - role name
+        self.role_name = self._get_attribute(data, 'role_name')
 
-        \u00A0 is a non-breaking space.
+        # - clan name
+        self.clan_name = self._get_attribute(data, 'clan_name')
 
-        """
-        rank_str = '--'
-        if self.previousRank != 0:
-            rank_diff = self.currentRank - self.previousRank
-            if rank_diff > 0:
-                rank_str = "↓ {}".format(rank_diff)
-            elif rank_diff < 0:
-                rank_str = "↑ {}".format(-rank_diff)
-        return "`{0:\u00A0>8} {1:\u00A0<16}`".format(self.currentRank, rank_str)
+        # - clan name
+        self.clan_tag = self._get_attribute(data, 'clan_tag')
 
     @property
-    def rankdelta(self):
+    def rank_delta(self):
         """Difference in rank.
 
         Return None if previous rank is 0
         """
-        if self.previousRank == 0:
+        if self.previous_rank == 0:
             return None
         else:
-            return self.currentRank - self.previousRank
+            return self.current_rank - self.previous_rank
 
     @property
     def league(self):
         """League ID from Arena ID."""
-        arenaID = self.arena["arenaID"]
-        leagueID = arenaID - 11
-        if leagueID > 0:
-            return leagueID
-        return 0
+        return max(0, self.arena.arean_id - 11)
 
     @property
     def league_icon_url(self):
@@ -975,174 +506,58 @@ class CRClanMemberModel:
             'league{}.png'
         ).format(self.league)
 
-    def league_emoji(self, bot):
-        """League emoji.
 
-        Goes through all servers the bot is on to find the emoji.
-        """
-        name = 'league{}'.format(self.league)
-        for server in bot.servers:
-            for emoji in server.emojis:
-                if emoji.name == name:
-                    return '<:{}:{}>'.format(emoji.name, emoji.id)
-        return ''
-
-    @property
-    def clan_name(self):
-        return self._clan_name
-
-    @clan_name.setter
-    def clan_name(self, value):
-        self._clan_name = value
-
-    @property
-    def clan_tag(self):
-        return self._clan_tag
-
-    @clan_tag.setter
-    def clan_tag(self, value):
-        self._clan_tag = value
-
-
-class CRClanModel:
+class Clan(BaseModel):
     """Clash Royale Clan data."""
 
-    def __init__(self, data=None, is_cache=False, timestamp=None, loaded=True):
-        """Init.
-        """
-        # self.__dict__.update(kwargs)
-        self.data = data
-        self.is_cache = is_cache
-        self.timestamp = timestamp
-        self.loaded = loaded
-        self._members = []
-        self._discord_role = None
+    def _update_attributes(self, data):
+        # - Name of clan
+        self.name = self._get_attribute(data, 'name')
 
-    @property
-    def badge(self):
-        """Badge."""
-        return self.data.get('badge', None)
+        # - badge
+        self.badge = Badge(data=self._get_attribute(data, 'badge'))
 
-    @property
-    def badge_url(self):
-        """Badge URL."""
-        try:
-            return self.data['badge']['url']
-        except KeyError:
-            return ''
+        # - type of the clan: enum
+        self.type = self._get_attribute(data, 'type')
 
-    @property
-    def current_rank(self):
-        """Current rank."""
-        return self.data.get('currentRank', None)
+        # - type name
+        self.type_name = self._get_attribute(data, 'typeName')
 
-    @property
-    def description(self):
-        """Description."""
-        return self.data.get('description', None)
+        # - number of memebers in clan
+        self.member_count = self._get_attribute(data, 'memberCount')
 
-    @property
-    def donations(self):
-        """Donations."""
-        return self.data.get('donations', None)
+        # - required trophies to join
+        self.required_score = self._get_attribute(data, 'requiredScore')
 
-    @property
-    def members(self):
-        """Members."""
-        if len(self._members) == 0:
-            members = self.data.get('members', None)
+        # - total donations for the week
+        self.donations = self._get_attribute(data, 'donations')
+
+        # - current rank
+        # TODO: not sure what this is
+        self.current_rank = self._get_attribute(data, 'currentRank')
+
+        # - clan description
+        self.description = self._get_attribute(data, 'description')
+
+        # - clan tag
+        self.tag = self._get_attribute(data, 'tag')
+
+        # - region
+        self.region = Region(data=self._get_attribute(data, 'region'))
+
+        # - members
+        members = self._get_attribute(data, 'members')
+        clan_dict = {
+            "clan_name": self.name,
+            "clan_tag": self.tag
+        }
+        self.members = []
+        if members is not None:
             for m in members:
-                member_model = CRClanMemberModel(data=m)
-                member_model.clan_name = self.name
-                member_model.clan_tag = self.tag
-                self._members.append(member_model)
-        return self._members
+                m.update(clan_dict)
+                self.members.append(ClanMember(data=m))
 
     @property
     def member_tags(self):
         """List of member tags."""
         return [m.tag for m in self.members]
-
-    @property
-    def name(self):
-        """Name."""
-        return self.data.get('name', None)
-
-    @property
-    def member_count(self):
-        """Member count."""
-        return self.data.get('memberCount', None)
-
-    @property
-    def region_name(self):
-        """Region."""
-        region = self.data.get('region', None)
-        if region is not None:
-            return region.get('name', None)
-        return None
-
-    @property
-    def required_score(self):
-        """Trophy requirement."""
-        return self.data.get('requiredScore', None)
-
-    @property
-    def score(self):
-        """Trophies."""
-        return self.data.get('score', None)
-
-    @property
-    def member_count_str(self):
-        """Member count in #/50 format."""
-        return '{}/50'.format(self.member_count)
-
-    @property
-    def tag(self):
-        """Tag."""
-        return self.data.get('tag', None)
-
-    @property
-    def type(self):
-        """Type."""
-        return self.data.get('type', None)
-
-    @property
-    def type_name(self):
-        """"Type name."""
-        return self.data.get('typeName', None)
-
-    @property
-    def valid(self):
-        """Return True if it has expected properties."""
-        return hasattr(self, 'name')
-
-    @property
-    def cache_message(self):
-        """Cache message."""
-        passed = dt.datetime.utcnow() - self.timestamp
-
-        days = passed.days
-        hours, remainder = divmod(passed.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-
-        days_str = '{} days '.format(days) if days > 0 else ''
-        passed_str = '{} {} hours {} minutes {} seconds ago'.format(days_str, hours, minutes, seconds)
-        return (
-            "Warning: Unable to access API. Returning cached data. "
-            "Real-time data in CR may be different. \n"
-            "Displaying data from {}.".format(passed_str)
-        )
-
-    """
-    Cog helper properties
-    """
-
-    @property
-    def discord_role(self):
-        """Discord role object."""
-        return self._discord_role
-
-    @discord_role.setter
-    def discord_role(self, value):
-        """Discord role object."""
-        self._discord_role = value

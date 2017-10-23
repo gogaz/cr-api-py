@@ -11,6 +11,8 @@ async def test_profile():
     assert player.tag == 'C0G20PR2'
     assert player.clan_name == 'Reddit Delta'
     assert player.clan_role == 'Leader'
+    assert player.deck is not None
+    assert player.shop_offers is not None
 
 
 @pytest.mark.asyncio

@@ -8,7 +8,7 @@ import asyncio
 import aiohttp
 import async_timeout
 
-from .models import ProfileModel, SCTag
+from .models import Profile, Tag, Clan
 
 
 class APIError(Exception):
@@ -58,16 +58,13 @@ class Client:
 
         return data
 
-    async def get_clan(self, clan_tag, include_members=True):
+    async def get_clan(self, clan_tag):
         """Fetch a single clan."""
-        url = '{api_url}/{members}'.format(
-            api_url=APIURL.clan.format(clan_tag),
-            members='' if include_members else '?members=0'
-        )
+        url = APIURL.clan.format(clan_tag)
         data = await self.fetch(url)
         if isinstance(data, list):
             data = data[0]
-        return data
+        return Clan(data=data, url=url)
 
     async def get_clans(self, clan_tags, include_members=True):
         """Fetch multiple clans.
@@ -90,19 +87,19 @@ class Client:
         data = await self.fetch(APIURL.top_clans)
         return data
 
-    async def get_profile(self, tag: str) -> ProfileModel:
+    async def get_profile(self, tag: str) -> Profile:
         """Get player profile by tag.
         :param tag: 
         :return: 
         """
-        ptag = SCTag(tag).tag
+        ptag = Tag(tag).tag
         url = APIURL.profile.format(ptag)
         data = await self.fetch(url)
-        return ProfileModel(json=data, url=url)
+        return Profile(data=data, url=url)
 
     async def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
-        ptags = [SCTag(tag).tag for tag in tags]
+        ptags = [Tag(tag).tag for tag in tags]
         url = APIURL.profile.format(','.join(ptags))
         data = await self.fetch(url)
-        return [ProfileModel(json=d, url=url) for d in data]
+        return [Profile(data=d, url=url) for d in data]
