@@ -202,7 +202,56 @@ class Deck(BaseModel):
     def _update_attributes(self, data):
         self.cards = [Card(data=c) for c in data]
 
+class PlayerExperience(BaseModel):
+    """Player experience."""
 
+    def _update_attributes(self, data):
+        self.level = self._get_attribute(data, 'level')
+        self.xp = self._get_attribute(data, 'xp')
+        self.xp_required_for_level_up = self._get_attribute(data, 'xpRequiredForLevelUp')
+        self.xp_to_level_up = self._get_attribute(data, 'xpToLevelUp')
+        
+class PlayerStats(BaseModel):
+    """Player stats."""
+    def _update_attributes(self, data):
+        self.legendary_trophies = self._get_attribute(data, 'legendaryTrophies')
+        self.tournament_cards_won = self._get_attribute(data, 'tournamentCardsWon')
+        self.max_trophies = self._get_attribute(data, 'maxTrophies')
+        self.three_crown_wins = self._get_attribute(data, 'threeCrownWins')
+        self.cards_found = self._get_attribute(data, 'cardsFound')
+        self.favorite_card = self._get_attribute(data, 'favoriteCard')
+        self.total_donatons = self._get_attribute(data, 'totalDonations')
+        self.challenge_max_wins = self._get_attribute(data, 'challengeMaxWins')
+        self.challenge_cards_won = self._get_attribute(data, 'challengeCardsWon')
+        self.level = self._get_attribute(data, 'level')
+
+class PlayerGames(BaseModel):
+    """Player game stats."""
+    def _update_attributes(self, data):
+        self.total = self._get_attribute(data, 'total')
+        self.tournament_games = self._get_attribute(data, 'tournamentGames')
+        self.wins = self._get_attribute(data, 'wins')
+        self.losses = self._get_attribute(data, 'losses')
+        self.draws = self._get_attribute(data, 'draws')
+        self.current_win_streak = self._get_attribute(data, 'currentWinStreak')
+        
+class PlayerChestCycle(BaseModel):
+    """Player chest cycle"""
+
+    def _update_attributes(self, data):
+        self.position = self._get_attribute(data, 'position')
+        self.super_magical_pos = self._get_attribute(data, 'superMagicalPos')
+        self.legendary_pos = self._get_attribute(data, 'legendaryPos')
+        self.epic_pos = self._get_attribute(data, 'epicPos')
+        
+class PlayerShopOffers(BaseModel):
+    """Shop offers."""
+
+    def _update_attributes(self, data):
+        self.legendary = self._get_attribute(data, 'legendary')
+        self.epic = self._get_attribute(data, 'epic')
+        self.arena = self._get_attribute(data, 'arena')
+        
 class Profile(BaseModel):
     """A player profile in Clash Royale."""
 
@@ -243,153 +292,26 @@ class Profile(BaseModel):
         self.clan_tag = self.clan.tag
         self.clan_role = self.clan.role
 
-        #: Clan badge URL
-        # if self.not_in_clan:
-        #     self.clan_badge_url = "http://smlbiobot.github.io/img/emblems/NoClan.png"
-        # else:
-        #     self.badge = self.clan.get('badge')
-        #     if self.badge:
-        #         self.badge_url = self.badge.get('url')
-        #     if self.badge_url:
-        #         self.clan_badge_url = 'http://api.cr-api.com' + self.badge_url
         self.badge = Badge(data=self._get_attribute(data, 'badge'))
 
-        #: ----------
+        #: Arena
+        self.arena = Arena(data=self._get_attribute(data, 'arena'))
+
         #: Experience
-        self.experience = self._get_attribute(data, 'experience')
+        self.experience = PlayerExperience(data=self._get_attribute(data, 'experience'))
 
-        if self.experience:
-            #: Level
-            self.level = self.experience.get('level')
-
-            #: XP level
-            self.xp = self.experience.get('xp')
-
-            #: Total XP
-            self.xp_total = self.experience.get('xpRequiredForLevelUp')
-
-            #: Experience as current / total
-            current = 'MAX'
-            total = 'MAX'
-            if isinstance(self.xp_total, int):
-                current = '{:,}'.format(self.xp)
-                total = '{:,}'.format(self.xp_total)
-            self.xp_str = '{} / {}'.format(current, total)
-
-        #: ----------
         #: Stats
-        self.stats = self._get_attribute(data, 'stats')
+        self.stats = PlayerStats(data=self._get_attribute(data, 'stats'))
 
-        #: Legendary trophies
-        self.trophy_legendary = 0
-
-        #: Highest trophies (personal best)
-        self.trophy_highest = 0
-
-        #: Current trophies
-        self.trophy_current = self.trophies
-
-        #: Tournament cards won
-        self.tourney_cards_won = 0
-
-        #: Three crown  wins
-        self.three_crown_wins = 0
-
-        #: Cards found
-        self.cards_found = 0
-
-        #: Favorite Card
-        self.favorite_card = None
-
-        #: Total donations
-        self.total_donations = 0
-
-        #: challenge max wins
-        self.challenge_max_wins = 0
-
-        #: challenge cards won
-        self.challenge_cards_won = 0
-
-        #: level
-        self.stats_level = 0
-
-        if self.stats:
-            self.trophy_legendary = self.stats.get('legendaryTrophies')
-            self.trophy_highest = self.stats.get('maxTrophies')
-            self.tourney_cards_won = self.stats.get('tournamentCardsWon')
-            self.three_crown_wins = self.stats.get('threeCrownWins')
-            self.cards_found = self.stats.get('cardsFound')
-            self.favorite_card = self.stats.get('favoriteCard')
-            self.total_donations = self.stats.get('totalDonations')
-            self.challenge_max_wins = self.stats.get('challengeMaxWins')
-            self.challenge_cards_won = self.stats.get('challengeCardsWon')
-            self.stats_level = self.stats.get('level')
-
-        #: ----------
         #: Games
-        self.games = self._get_attribute(data, 'games')
+        self.games = PlayerGames(data=self._get_attribute(data, 'games'))
 
-        #: total games
-        self.total_games = 0
-
-        #: tournament games
-        self.tournament_games = 0
-
-        #: wins
-        self.wins = 0
-
-        #: losses
-        self.losses = 0
-
-        #: draws
-        self.draws = 0
-
-        #: win streak
-        self.win_streak = 0
-
-        if self.games:
-            self.total_games = self.games.get('total')
-            self.tournament_games = self.games.get('tournamentGames')
-            self.wins = self.games.get('wins')
-            self.losses = self.games.get('losses')
-            self.draws = self.games.get('draws')
-            self.win_streak = max(0, self.games.get('currentWinStreak', 0))
-
-        #: ----------
         #: Chests
-        self.chest_cycle = self._get_attribute(data, 'chestCycle')
-        self.chest_position = 0
-        self.chest_super_magical_position = 0
-        self.chest_legendary_position = 0
-        self.chest_epic_position = 0
+        self.chest_cycle = PlayerChestCycle(data=self._get_attribute(data, 'chestCycle'))
 
-        if self.chest_cycle:
-            self.chest_position = self.chest_cycle.get('position')
-            self.chest_super_magical_position = self.chest_cycle.get('superMagicalPos')
-            self.chest_legendary_position = self.chest_cycle.get('legendaryPos')
-            self.chest_epic_position = self.chest_cycle.get('epicPos')
-
-        self.chests_opened = self.chest_position
-
-        #: ----------
         #: Shop offers
-        self.shop_offers = self._get_attribute(data, 'shopOffers')
+        self.shop_offers = PlayerShopOffers(data=self._get_attribute(data, 'shopOffers'))
 
-        #: legendary offer
-        self.shop_offers_legendary = None
-
-        #: epic offer
-        self.shop_offers_epic = None
-
-        #: arena offer
-        self.shop_offers_arena = None
-
-        if self.shop_offers:
-            self.shop_offers_legendary = self.shop_offers.get('legendary')
-            self.shop_offers_epic = self.shop_offers.get('epic')
-            self.shop_offers_arena = self.shop_offers.get('arena')
-
-        #: ----------
         #: Deck
         self.deck = Deck(data=self._get_attribute(data, 'currentDeck'))
 
