@@ -35,34 +35,28 @@ class Client:
     API Client.
     """
 
-    def __init__(self, session=None, timeout=30):
-        if session is None:
-            session = aiohttp.ClientSession()
-        self.session = session
-
-        self.timeout = timeout
-
-        self.url = {
-            "clan": 'http://api.cr-api.com/clan/{}'
-        }
+    def __init__(self):
+        pass
 
     async def fetch(self, url):
         """Fetch URL.
 
-        :param session: aiohttp.ClientSession
         :param url: URL
         :return: Response in JSON
         """
+        data = None
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     if resp.status != 200:
                         raise APIError
-                    return resp.json()
+                    data = await resp.json()
         except asyncio.TimeoutError:
             raise APITimeoutError
         except aiohttp.client_exceptions.ClientResponseError:
             raise APIClientResponseError
+
+        return data
 
     async def get_clan(self, clan_tag, include_members=True):
         """Fetch a single clan."""

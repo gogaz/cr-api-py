@@ -163,6 +163,9 @@ class CRBaseModel(object):
     def __ne__(self, other):
         return self._uniq != other._uniq
 
+    def _repr(self):
+        return "{}({})".format(self.__class__, self.__dict__)
+
 
 class ProfileModel(CRBaseModel):
     """A player profile in Clash Royale."""
