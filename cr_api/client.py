@@ -64,7 +64,6 @@ class Client:
             api_url=APIURL.clan.format(clan_tag),
             members='' if include_members else '?members=0'
         )
-        print(url)
         data = await self.fetch(url)
         if isinstance(data, list):
             data = data[0]
@@ -99,7 +98,7 @@ class Client:
         ptag = SCTag(tag).tag
         url = APIURL.profile.format(ptag)
         data = await self.fetch(url)
-        return ProfileModel(json=data)
+        return ProfileModel(json=data, url=url)
 
     async def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
