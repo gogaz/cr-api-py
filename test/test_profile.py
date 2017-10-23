@@ -1,7 +1,7 @@
 import pytest
 
 from cr_api import Client
-from cr_api.models import Profile
+from cr_api.models import Player
 
 
 @pytest.mark.asyncio
@@ -36,7 +36,7 @@ def test_profile_model():
     with open('./test/data/C0G20PR2.json') as f:
         json_str = f.read()
 
-    p = Profile.from_json(json_str)
+    p = Player.from_json(json_str)
     assert p.name == 'SML'
     assert p.tag == 'C0G20PR2'
     assert p.clan_name == 'Reddit Delta'

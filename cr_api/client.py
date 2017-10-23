@@ -6,9 +6,8 @@ when multiple classes need to access these endpoints.
 import asyncio
 
 import aiohttp
-import async_timeout
 
-from .models import Profile, Tag, Clan
+from .models import Clan, Tag, Player
 
 
 class APIError(Exception):
@@ -22,6 +21,7 @@ class APITimeoutError(APIError):
 class APIClientResponseError(APIError):
     pass
 
+
 class APIURL:
     """
     API URL
@@ -29,6 +29,7 @@ class APIURL:
     clan = 'http://api.cr-api.com/clan/{}'
     top_clans = 'http://api.cr-api.com/top/clans'
     profile = 'http://api.cr-api.com/profile/{}'
+
 
 class Client:
     """
@@ -87,7 +88,7 @@ class Client:
         data = await self.fetch(APIURL.top_clans)
         return data
 
-    async def get_profile(self, tag: str) -> Profile:
+    async def get_profile(self, tag: str) -> Player:
         """Get player profile by tag.
         :param tag: 
         :return: 
@@ -95,11 +96,11 @@ class Client:
         ptag = Tag(tag).tag
         url = APIURL.profile.format(ptag)
         data = await self.fetch(url)
-        return Profile(data=data, url=url)
+        return Player(data=data, url=url)
 
     async def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [Tag(tag).tag for tag in tags]
         url = APIURL.profile.format(','.join(ptags))
         data = await self.fetch(url)
-        return [Profile(data=d, url=url) for d in data]
+        return [Player(data=d, url=url) for d in data]
