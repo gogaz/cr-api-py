@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'cr_api',
   packages = ['cr_api'],
-  version = '0.2',
+  version = '0.3',
   description = 'A wrapper for cr-api.com, a Clash Royale API.',
   author = 'SML',
   author_email = 'smlbiobot@gmail.com',
