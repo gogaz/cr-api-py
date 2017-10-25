@@ -1,7 +1,5 @@
 """
-Unified module to call api for data.
-In the beginning managers were used but this became problematic
-when multiple classes need to access these endpoints.
+cr-api client for Clash Royale.
 """
 import asyncio
 
