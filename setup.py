@@ -1,8 +1,9 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
+
 setup(
   name = 'cr_api',
-  packages = ['cr_api'],
-  version = '0.3',
+  packages = find_packages(),
+  version = '0.4',
   description = 'A wrapper for cr-api.com, a Clash Royale API.',
   author = 'SML',
   author_email = 'smlbiobot@gmail.com',
