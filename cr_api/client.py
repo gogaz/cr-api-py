@@ -2,12 +2,12 @@
 cr-api client for Clash Royale.
 """
 import asyncio
+import logging
 
 import aiohttp
 
-from cr_api.models import Clan, Tag, Player, Constants
-from cr_api.exceptions import APIError, APIClientResponseError, APITimeoutError
-import logging
+from .exceptions import APIError, APIClientResponseError, APITimeoutError
+from .models import Clan, Tag, Player, Constants
 
 logger = logging.getLogger('__name__')
 logger.setLevel(logging.DEBUG)
@@ -16,9 +16,6 @@ ch.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
-
-
-
 
 
 class APIURL:
@@ -120,4 +117,3 @@ class Client:
         url = APIURL.constants
         data = await self.fetch(url)
         return Constants(data=data, url=url)
-
