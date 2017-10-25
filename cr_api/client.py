@@ -7,7 +7,16 @@ import asyncio
 
 import aiohttp
 
-from .models import Clan, Tag, Player
+from .models import Clan, Tag, Player, Constants
+import logging
+
+logger = logging.getLogger('__name__')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 class APIError(Exception):
@@ -29,6 +38,7 @@ class APIURL:
     clan = 'http://api.cr-api.com/clan/{}'
     top_clans = 'http://api.cr-api.com/top/clans'
     profile = 'http://api.cr-api.com/profile/{}'
+    constants = 'http://api.cr-api.com/constants'
 
 
 class Client:
@@ -45,13 +55,20 @@ class Client:
         :param url: URL
         :return: Response in JSON
         """
-        data = None
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
-                    if resp.status != 200:
-                        raise APIError
                     data = await resp.json()
+                    if resp.status != 200:
+                        logger.error(
+                            "API Error | HTTP status {status} | {errmsg} | url: {url}".format(
+                                status=resp.status,
+                                errmsg=data.get('error'),
+                                url=url
+                            )
+                        )
+                        raise APIError
+
         except asyncio.TimeoutError:
             raise APITimeoutError
         except aiohttp.client_exceptions.ClientResponseError:
@@ -104,3 +121,13 @@ class Client:
         url = APIURL.profile.format(','.join(ptags))
         data = await self.fetch(url)
         return [Player(data=d, url=url) for d in data]
+
+    async def get_constants(self, key=None):
+        """Fetch contants.
+
+        :param key: Optional field.
+        """
+        url = APIURL.constants
+        data = await self.fetch(url)
+        return Constants(data=data, url=url)
+

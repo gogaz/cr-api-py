@@ -46,7 +46,8 @@ class Badge(BaseModel):
 class Region(BaseModel):
     def _update_attributes(self, data):
         # - region is a country
-        self.is_country = self._get_attribute(data, 'isCountry')
+        is_country = self._get_attribute(data, 'isCountry')
+        self.is_country = is_country == True or is_country == 'true'
 
         # - name
         self.name = self._get_attribute(data, 'name')
@@ -60,7 +61,32 @@ class Arena(BaseModel):
         self.name = self._get_attribute(data, 'name')
         self.trophy_limit = self._get_attribute(data, 'trophyLimit')
 
+class Rarity(BaseModel):
+    """Rarity."""
+    def _update_attributes(self, data):
+        self.balance_multiplier = self._get_attribute(data, 'balance_multiplier')
+        self.chance_weight = self._get_attribute(data, 'chance_weight')
+        self.clone_relative_level = self._get_attribute(data, 'clone_relative_level')
+        self.donate_capacity = self._get_attribute(data, 'donate_capacity')
+        self.donate_reward = self._get_attribute(data, 'donate_reward')
+        self.donate_xp = self._get_attribute(data, 'donate_xp')
+        self.mirror_relative_level = self._get_attribute(data, 'mirror_relative_level')
+        self.name = self._get_attribute(data, 'name')
+        self.power_level_multiplier = self._get_attribute(data, 'power_level_multiplier')
+        self.refund_gems = self._get_attribute(data, 'refund_gems')
+        self.relative_level = self._get_attribute(data, 'relative_level')
+        self.sort_capacity = self._get_attribute(data, 'sort_capacity')
+        self.upgrade_cost = self._get_attribute(data, 'upgrade_cost')
+        self.upgrade_exp = self._get_attribute(data, 'upgrade_exp')
+        self.upgrade_material_count = self._get_attribute(data, 'upgrade_material_count')
 
+class ChestCycle(BaseModel):
+    """Chest cycle."""
+    def _update_attributes(self, data):
+        self.order = self._get_attribute(data, 'order')
+        
+        
+        
 class Tag:
     """SuperCell tags."""
 
