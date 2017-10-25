@@ -1,6 +1,6 @@
 # cr-api-py
 
-This is a async Python wrapper for [cr-api](http://github.com/cr-api/cr-api).
+This is an async Python wrapper for [cr-api](http://github.com/cr-api/cr-api). See http://docs.cr-api.com for documentation on the expected fields.
 
 ## Installation
 
