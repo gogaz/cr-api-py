@@ -5,8 +5,8 @@ import asyncio
 
 import aiohttp
 
-from .models import Clan, Tag, Player, Constants
-from .exceptions import APIError, APIClientResponseError, APITimeoutError
+from cr_api.models import Clan, Tag, Player, Constants
+from cr_api.exceptions import APIError, APIClientResponseError, APITimeoutError
 import logging
 
 logger = logging.getLogger('__name__')
