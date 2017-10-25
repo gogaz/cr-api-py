@@ -30,7 +30,7 @@ print(player.tag)
 
 ## Tests
 
-This package uses (pytest-asyncio)[https://github.com/pytest-dev/pytest-asyncio] for tests.
+This package uses [pytest-asyncio](https://github.com/pytest-dev/pytest-asyncio) for tests.
 
 Run all tests:
 
