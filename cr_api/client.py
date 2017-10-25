@@ -6,6 +6,7 @@ import asyncio
 import aiohttp
 
 from .models import Clan, Tag, Player, Constants
+from .exceptions import APIError, APIClientResponseError, APITimeoutError
 import logging
 
 logger = logging.getLogger('__name__')
@@ -17,16 +18,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-class APIError(Exception):
-    pass
 
-
-class APITimeoutError(APIError):
-    pass
-
-
-class APIClientResponseError(APIError):
-    pass
 
 
 class APIURL:
