@@ -2,6 +2,7 @@
 Clan
 """
 from .base import BaseModel
+from .core import Badge, Region, Arena
 
 
 class ClanChest(BaseModel):
