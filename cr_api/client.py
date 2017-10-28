@@ -1,5 +1,5 @@
 """
-cr-api async client for Clash Royale.
+cr-api client for Clash Royale.
 """
 import logging
 
