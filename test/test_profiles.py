@@ -1,11 +1,11 @@
 import pytest
 
-from cr_api import Client
+from cr_api import AsyncClient
 
 
 @pytest.mark.asyncio
 async def test_profiles():
-    client = Client()
+    client = AsyncClient()
     players = await client.get_profiles(['C0G20PR2', 'PY9VC98C'])
     assert players[0].name == 'SML'
     assert players[0].tag == 'C0G20PR2'

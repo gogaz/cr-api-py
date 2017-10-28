@@ -1,11 +1,11 @@
 import pytest
 
-from cr_api import Client
+from cr_api import AsyncClient
 
 
 @pytest.mark.asyncio
 async def test_constants():
-    client = Client()
+    client = AsyncClient()
     constants = await client.get_constants()
     assert constants.arenas[0].arena == 'Arena 1'
     assert constants.badges["16000000"] == 'Flame_01'

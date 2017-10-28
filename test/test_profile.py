@@ -1,12 +1,12 @@
 import pytest
 
-from cr_api import Client
+from cr_api import AsyncClient
 from cr_api.models import Player
 
 
 @pytest.mark.asyncio
 async def test_profile():
-    client = Client()
+    client = AsyncClient()
     player = await client.get_profile('C0G20PR2')
     assert player.name == 'SML'
     assert player.tag == 'C0G20PR2'
@@ -18,7 +18,7 @@ async def test_profile():
 
 @pytest.mark.asyncio
 async def test_profile_equal():
-    client = Client()
+    client = AsyncClient()
     player1 = await client.get_profile('C0G20PR2')
     player2 = await client.get_profile('C0G20PR2')
     assert player1 == player2
@@ -26,7 +26,7 @@ async def test_profile_equal():
 
 @pytest.mark.asyncio
 async def test_profile_not_equal():
-    client = Client()
+    client = AsyncClient()
     player1 = await client.get_profile('C0G20PR2')
     player2 = await client.get_profile('PY9VC98C')
     assert player1 != player2
