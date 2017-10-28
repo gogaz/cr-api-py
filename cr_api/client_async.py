@@ -62,21 +62,14 @@ class AsyncClient:
             data = data[0]
         return Clan(data=data, url=url)
 
-    async def get_clans(self, clan_tags, include_members=True):
+    async def get_clans(self, clan_tags):
         """Fetch multiple clans.
 
         :param clan_tags: List of clan tags
-        :param include_members: Include members or not.
-
-        URL Format: http://api.cr-api.com/clan/28VVQPV9,Y8GYCGV/?members=0
         """
-        url = '{api_url}/{tag_list}/{members}'.format(
-            api_url=APIURL.clan,
-            tag_list=','.join(clan_tags),
-            members='' if include_members else '?members=0'
-        )
+        url = APIURL.clan.format(','.join(clan_tags))
         data = await self.fetch(url)
-        return data
+        return [Clan(data=d, url=url) for d in data]
 
     async def get_top_clans(self):
         """Fetch top clans."""
