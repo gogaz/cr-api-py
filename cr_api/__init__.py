@@ -1,7 +1,7 @@
 """
 Clash Royale wrapper for cr-api.com
 """
-__version__ = "0.6"
+__version__ = "0.8"
 
 from .client_async import AsyncClient
 from .client import Client
