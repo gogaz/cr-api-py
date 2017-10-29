@@ -1,6 +1,6 @@
 import pytest
 
-from cr_api import AsyncClient, Client
+from crapipy import AsyncClient, Client
 
 
 @pytest.mark.asyncio

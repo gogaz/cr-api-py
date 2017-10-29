@@ -1,7 +1,7 @@
 import pytest
 
-from cr_api import AsyncClient
-from cr_api.models import Player
+from crapipy import AsyncClient
+from crapipy.models import Player
 
 
 @pytest.mark.asyncio
