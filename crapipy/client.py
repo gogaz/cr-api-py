@@ -1,16 +1,14 @@
 """
 cr-api client for Clash Royale.
 """
-import logging
 import json
+import logging
 
 import requests
 from requests.exceptions import HTTPError
-from .util import make_box, make_box_list
 
 from .exceptions import APIError
-from .models_legacy import Tag
-from .models import Clan, TopClans, Player, Constants
+from .models import Clan, TopClans, Player, Constants, Tag
 from .url import APIURL
 
 logger = logging.getLogger('__name__')
@@ -20,8 +18,6 @@ ch.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
-
-
 
 
 class Client:

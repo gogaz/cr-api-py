@@ -2,15 +2,15 @@
 cr-api async client for Clash Royale.
 """
 import asyncio
-import logging
 import json
-from .util import make_box, make_box_list
+import logging
 
 import aiohttp
 
-from .exceptions import APIError, APIClientResponseError, APITimeoutError
+from .exceptions import APIError
 from .models import Clan, Tag, Player, Constants
 from .url import APIURL
+from .util import make_box
 
 logger = logging.getLogger('__name__')
 logger.setLevel(logging.DEBUG)
