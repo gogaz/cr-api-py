@@ -60,7 +60,7 @@ class AsyncClient:
         data = await self.fetch(url)
         if isinstance(data, list):
             data = data[0]
-        return make_box(data)
+        return Clan(data)
 
     async def get_clans(self, clan_tags):
         """Fetch multiple clans.
@@ -69,7 +69,7 @@ class AsyncClient:
         """
         url = APIURL.clan.format(','.join(clan_tags))
         data = await self.fetch(url)
-        return make_box_list(data)
+        return [Clan(d) for d in data]
 
     async def get_top_clans(self):
         """Fetch top clans."""
@@ -84,14 +84,14 @@ class AsyncClient:
         ptag = Tag(tag).tag
         url = APIURL.profile.format(ptag)
         data = await self.fetch(url)
-        return make_box(data)
+        return Player(data)
 
     async def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [Tag(tag).tag for tag in tags]
         url = APIURL.profile.format(','.join(ptags))
         data = await self.fetch(url)
-        return make_box_list(data)
+        return [Player(d) for d in data]
 
     async def get_constants(self, key=None):
         """Fetch contants.
@@ -100,4 +100,4 @@ class AsyncClient:
         """
         url = APIURL.constants
         data = await self.fetch(url)
-        return make_box(data)
+        return Constants(data)

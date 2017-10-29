@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Clash Royale models.
+Clash Royale models_legacy.
 """
 
 from json import dumps, loads

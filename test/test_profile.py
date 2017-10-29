@@ -8,6 +8,8 @@ def assert_player_model(player):
     assert player.tag == 'C0G20PR2'
     assert player.clan.name == 'Reddit Delta'
     assert player.clan.role == 'Leader'
+    assert player.clan_name == player.clan.name
+    assert player.clan_role == player.clan.role
     assert player.current_deck is not None
     assert player.shop_offers is not None
     assert player.arena.arena_id == player.arena.arenaID

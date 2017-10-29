@@ -9,7 +9,6 @@ async def test_constants():
     client = AsyncClient()
     constants = await client.get_constants()
     pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(constants)
     assert constants.arenas[0].arena == 'Arena 1'
     assert constants.badges["16000000"] == 'Flame_01'
     assert constants.chest_cycle.order[0] == 'Silver'
