@@ -111,10 +111,12 @@ class Player(BaseModel):
         #: Clan role
         self.clan_role = 'N/A'
 
+        #: Clan shortcuts
         self.clan_name = self.clan.name
         self.clan_tag = self.clan.tag
         self.clan_role = self.clan.role
 
+        #: Clan badge
         self.badge = Badge(data=self._get_attribute(data, 'badge'))
 
         #: Arena
