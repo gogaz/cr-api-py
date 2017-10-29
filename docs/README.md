@@ -14,19 +14,49 @@ pip install cr-api
 
 The models allow you to read fields from the API JSON using dot syntax. Camel case properties are converted into name_with_underscore.
 
+
+### Non-Async
+
 ```python
 from cr_api import Client
 
+client = Client()
+
 # get clan
-clan = await client.get_clan('2CCCP')
+clan = client.get_clan('2CCCP')
 print(clan.name)
 print(clan.badge.key)
 
 # get player profile
-player = await client.get_profile('C0G20PR2')
+player = client.get_profile('C0G20PR2')
 print(player.name)
 print(player.tag)
 ```
+
+### Async
+
+```python
+import asyncio
+from cr_api import AsyncClient
+
+async def main():
+    client = AsyncClient()
+    # get clan
+    clan = await client.get_clan('2CCCP')
+    print(clan.name)
+    print(clan.badge.key)
+
+    # get player profile
+    player = await client.get_profile('C0G20PR2')
+    print(player.name)
+    print(player.tag)
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+loop.close()
+
+```
+
 
 ## Tests
 
