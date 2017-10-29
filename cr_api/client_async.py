@@ -47,10 +47,8 @@ class AsyncClient:
                         )
                         raise APIError
 
-        except asyncio.TimeoutError:
-            raise APITimeoutError
-        except aiohttp.client_exceptions.ClientResponseError:
-            raise APIClientResponseError
+        except (asyncio.TimeoutError, aiohttp.ClientResponseError):
+            raise APIError
 
         return data
 
