@@ -3,6 +3,7 @@ cr-api async client for Clash Royale.
 """
 import asyncio
 import logging
+import json
 
 import aiohttp
 
@@ -47,7 +48,7 @@ class AsyncClient:
                         )
                         raise APIError
 
-        except (asyncio.TimeoutError, aiohttp.ClientResponseError):
+        except (asyncio.TimeoutError, aiohttp.ClientResponseError, json.JSONDecodeError):
             raise APIError
 
         return data
