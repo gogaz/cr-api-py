@@ -39,9 +39,8 @@ class Client:
 
             if r.status_code != 200:
                 logger.error(
-                    "API Error | HTTP status {status} | {errmsg} | url: {url}".format(
-                        status=resp.status,
-                        errmsg=data.get('error'),
+                    "API Error | HTTP status {status} | url: {url}".format(
+                        status=r.status_code,
                         url=url
                     )
                 )
