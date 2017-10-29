@@ -4,6 +4,7 @@ cr-api async client for Clash Royale.
 import asyncio
 import logging
 import json
+from .util import make_box, make_box_list
 
 import aiohttp
 
@@ -59,7 +60,7 @@ class AsyncClient:
         data = await self.fetch(url)
         if isinstance(data, list):
             data = data[0]
-        return Clan(data=data, url=url)
+        return make_box(data)
 
     async def get_clans(self, clan_tags):
         """Fetch multiple clans.
@@ -68,12 +69,12 @@ class AsyncClient:
         """
         url = APIURL.clan.format(','.join(clan_tags))
         data = await self.fetch(url)
-        return [Clan(data=d, url=url) for d in data]
+        return make_box_list(data)
 
     async def get_top_clans(self):
         """Fetch top clans."""
         data = await self.fetch(APIURL.top_clans)
-        return data
+        return make_box(data)
 
     async def get_profile(self, tag: str) -> Player:
         """Get player profile by tag.
@@ -83,14 +84,14 @@ class AsyncClient:
         ptag = Tag(tag).tag
         url = APIURL.profile.format(ptag)
         data = await self.fetch(url)
-        return Player(data=data, url=url)
+        return make_box(data)
 
     async def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [Tag(tag).tag for tag in tags]
         url = APIURL.profile.format(','.join(ptags))
         data = await self.fetch(url)
-        return [Player(data=d, url=url) for d in data]
+        return make_box_list(data)
 
     async def get_constants(self, key=None):
         """Fetch contants.
@@ -99,4 +100,4 @@ class AsyncClient:
         """
         url = APIURL.constants
         data = await self.fetch(url)
-        return Constants(data=data, url=url)
+        return make_box(data)

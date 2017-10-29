@@ -6,9 +6,10 @@ import json
 
 import requests
 from requests.exceptions import HTTPError
+from .util import make_box, make_box_list
 
 from .exceptions import APIError
-from .models import Clan, Tag, Player, Constants
+from .models import Tag
 from .url import APIURL
 
 logger = logging.getLogger('__name__')
@@ -18,6 +19,8 @@ ch.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+
+
 
 
 class Client:
@@ -58,9 +61,7 @@ class Client:
         """Fetch a single clan."""
         url = APIURL.clan.format(clan_tag)
         data = self.fetch(url)
-        if isinstance(data, list):
-            data = data[0]
-        return Clan(data=data, url=url)
+        return make_box(data)
 
     def get_clans(self, clan_tags):
         """Fetch multiple clans.
@@ -69,14 +70,14 @@ class Client:
         """
         url = APIURL.clan.format(','.join(clan_tags))
         data = self.fetch(url)
-        return [Clan(data=d, url=url) for d in data]
+        return make_box_list(data)
 
     def get_top_clans(self):
         """Fetch top clans."""
         data = self.fetch(APIURL.top_clans)
-        return data
+        return make_box_list(data)
 
-    def get_profile(self, tag: str) -> Player:
+    def get_profile(self, tag: str):
         """Get player profile by tag.
         :param tag:
         :return:
@@ -84,14 +85,14 @@ class Client:
         ptag = Tag(tag).tag
         url = APIURL.profile.format(ptag)
         data = self.fetch(url)
-        return Player(data=data, url=url)
+        return make_box(data)
 
     def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [Tag(tag).tag for tag in tags]
         url = APIURL.profile.format(','.join(ptags))
         data = self.fetch(url)
-        return [Player(data=d, url=url) for d in data]
+        return make_box_list(data)
 
     def get_constants(self, key=None):
         """Fetch contants.
@@ -100,4 +101,4 @@ class Client:
         """
         url = APIURL.constants
         data = self.fetch(url)
-        return Constants(data=data, url=url)
+        return make_box(data)

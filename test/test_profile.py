@@ -1,19 +1,30 @@
 import pytest
 
-from crapipy import AsyncClient
-from crapipy.models import Player
+from crapipy import AsyncClient, Client
+
+
+def assert_player_model(player):
+    assert player.name == 'SML'
+    assert player.tag == 'C0G20PR2'
+    assert player.clan.name == 'Reddit Delta'
+    assert player.clan.role == 'Leader'
+    assert player.current_deck is not None
+    assert player.shop_offers is not None
+    assert player.arena.arena_id == player.arena.arenaID
+    assert player.arena.arena_id is not None
 
 
 @pytest.mark.asyncio
-async def test_profile():
+async def test_profile_async():
     client = AsyncClient()
     player = await client.get_profile('C0G20PR2')
-    assert player.name == 'SML'
-    assert player.tag == 'C0G20PR2'
-    assert player.clan_name == 'Reddit Delta'
-    assert player.clan_role == 'Leader'
-    assert player.deck is not None
-    assert player.shop_offers is not None
+    assert_player_model(player)
+
+
+def test_profile():
+    client = Client()
+    player = client.get_profile('C0G20PR2')
+    assert_player_model(player)
 
 
 @pytest.mark.asyncio
@@ -30,21 +41,3 @@ async def test_profile_not_equal():
     player1 = await client.get_profile('C0G20PR2')
     player2 = await client.get_profile('PY9VC98C')
     assert player1 != player2
-
-def test_profile_model():
-    """Load static data to test model."""
-    with open('./test/data/C0G20PR2.json') as f:
-        json_str = f.read()
-
-    p = Player.from_json(json_str)
-    assert p.name == 'SML'
-    assert p.tag == 'C0G20PR2'
-    assert p.clan_name == 'Reddit Delta'
-    assert p.clan_role == 'Leader'
-    assert p.arena is not None
-    assert p.arena.image_url == '/arena/league2.png'
-    assert p.arena.arena_id == 13
-    assert p.arena.name == 'Challenger II'
-    assert p.clan.name == 'Reddit Delta'
-    assert p.clan.badge.key == 'A_Char_Rocket_02'
-    assert p.experience.level == 12
