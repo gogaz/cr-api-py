@@ -12,8 +12,56 @@ pip install crapipy
 
 ## How to use
 
-The models allow you to read fields from the API JSON using dot syntax. Camel case properties are converted into name_with_underscore.
+You can access data using blocking or async code. Internally, the wrapper uses the requests library for blocking code and the aiohttp library for async code.
 
+To initiate a client for connection:
+
+### Blocking
+
+```python
+from crapipy import Client
+client = Client()
+```
+
+### Async
+
+```python
+from crapipy import AsyncClient
+client = AsyncClient()
+```
+
+## Methods
+
+Both the blocking and async client uses the same method names. 
+
+```python
+player = client.get_profile('C0G20PR2')
+```
+
+The object returned allow you to access the JSON returned as dict or dot notation.
+
+- dict: `player['arena']['arenaID']`
+- attribute as CamelCaseKeys: `player.arena.arenaID`
+- attribute as snake_case_attributes: `player.arena.arena_id`
+
+Additionally, you can use:
+
+- `to_dict()`: to read as dictionary
+- `to_json()`: to convert back into JSON
+- `to_yaml()`: to convert into YAML
+
+### get_clan(tag)
+
+### get_clans(tags)
+
+### get_profile(tag)
+
+### get_profiles(tags)
+
+### get_constants()
+
+
+## Examples
 
 ### Non-Async
 

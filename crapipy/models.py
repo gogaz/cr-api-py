@@ -54,6 +54,17 @@ class Constants(BaseModel):
         order = self.chest_cycle.order
         return order[index % len(order)]
 
+    def get_card(self, key=None, card_key=None, name=None):
+        """Return card by any property"""
+        for card in self.cards:
+            if card.key == key:
+                return card
+            if card.card_key == card_key:
+                return card
+            if card.name == name:
+                return card
+        return None
+
 
 class Tag:
     """SuperCell tags."""
