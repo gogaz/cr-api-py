@@ -49,6 +49,11 @@ class Constants(BaseModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def get_chest_by_index(self, index):
+        """Return chest by index."""
+        order = self.chest_cycle.order
+        return order[index % len(order)]
+
 
 class Tag:
     """SuperCell tags."""
