@@ -6,7 +6,6 @@ from .base import BaseModel
 from .core import Deck, Badge, Arena
 
 
-
 class PlayerClan(BaseModel):
     """Clan model inside a profile."""
 
@@ -15,7 +14,6 @@ class PlayerClan(BaseModel):
         self.name = self._get_attribute(data, 'name', 'No Clan')
         self.role = self._get_attribute(data, 'role', 'N/A')
         self.badge = Badge(data=self._get_attribute(data, 'badge'))
-
 
 
 class PlayerExperience(BaseModel):
