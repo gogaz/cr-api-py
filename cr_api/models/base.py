@@ -11,8 +11,6 @@ __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
 
-
-
 class BaseModel(object):
     """Clash Royale base model."""
 
@@ -114,6 +112,3 @@ class BaseModel(object):
 
     def _repr(self):
         return "{}({})".format(self.__class__, self.__dict__)
-
-
-

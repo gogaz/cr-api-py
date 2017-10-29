@@ -1,8 +1,10 @@
 from .base import BaseModel
-from .core import Region, Badge, Arena, Rarity, Card, ChestCycle
+from .core import Region, Arena, Rarity, Card, ChestCycle
+
 
 class Constants(BaseModel):
     """API contants."""
+
     def _update_attributes(self, data):
         self.arenas = [Arena(data=d) for d in self._get_attribute(data, "arenas")]
         self.badges = self._get_attribute(data, "badges")
@@ -22,4 +24,3 @@ class Constants(BaseModel):
     def get_chest_by_index(self, index):
         """Return chest by index."""
         return self.chest_cycle.order[index]
-

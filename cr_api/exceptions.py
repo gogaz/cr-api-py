@@ -2,6 +2,7 @@
 Wrapper exceptions
 """
 
+
 class APIError(Exception):
     pass
 

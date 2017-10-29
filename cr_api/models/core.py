@@ -61,8 +61,10 @@ class Arena(BaseModel):
         self.name = self._get_attribute(data, 'name')
         self.trophy_limit = self._get_attribute(data, 'trophyLimit')
 
+
 class Rarity(BaseModel):
     """Rarity."""
+
     def _update_attributes(self, data):
         self.balance_multiplier = self._get_attribute(data, 'balance_multiplier')
         self.chance_weight = self._get_attribute(data, 'chance_weight')
@@ -80,13 +82,14 @@ class Rarity(BaseModel):
         self.upgrade_exp = self._get_attribute(data, 'upgrade_exp')
         self.upgrade_material_count = self._get_attribute(data, 'upgrade_material_count')
 
+
 class ChestCycle(BaseModel):
     """Chest cycle."""
+
     def _update_attributes(self, data):
         self.order = self._get_attribute(data, 'order')
-        
-        
-        
+
+
 class Tag:
     """SuperCell tags."""
 
