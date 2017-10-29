@@ -2,6 +2,7 @@
 cr-api client for Clash Royale.
 """
 import logging
+import json
 
 import requests
 from requests.exceptions import HTTPError
@@ -48,10 +49,7 @@ class Client:
 
             data = r.json()
 
-        except HTTPError:
-            raise APIError
-
-        except ConnectionError:
+        except (HTTPError, ConnectionError, json.JSONDecodeError):
             raise APIError
 
         return data
