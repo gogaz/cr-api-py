@@ -1,4 +1,4 @@
-# cr-api-py
+# crapipy
 
 This is an async Python wrapper for [cr-api](http://github.com/cr-api/cr-api). See http://docs.cr-api.com for documentation on the expected fields.
 
@@ -7,7 +7,7 @@ This is an async Python wrapper for [cr-api](http://github.com/cr-api/cr-api). S
 Install via pip:
 
 ```sh
-pip install cr-api
+pip install crapipy
 ```
 
 ## How to use
@@ -18,7 +18,7 @@ The models allow you to read fields from the API JSON using dot syntax. Camel ca
 ### Non-Async
 
 ```python
-from cr_api import Client
+from crapipy import Client
 
 def main():
     client = Client()
@@ -61,7 +61,7 @@ main()
 
 ```python
 import asyncio
-from cr_api import AsyncClient
+from crapipy import AsyncClient
 
 async def main():
     client = AsyncClient()
