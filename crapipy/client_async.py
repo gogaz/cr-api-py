@@ -8,7 +8,7 @@ import logging
 import aiohttp
 
 from .exceptions import APIError
-from .models import Clan, Tag, Player, Constants
+from .models import Clan, Tag, Player, Constants, TopPlayers
 from .url import APIURL
 from .util import make_box
 
@@ -101,3 +101,9 @@ class AsyncClient:
         url = APIURL.constants
         data = await self.fetch(url)
         return Constants(data)
+
+    async def get_top_players(self):
+        """Fetch top players."""
+        url = APIURL.top_players
+        data = await self.fetch(url)
+        return TopPlayers(data)

@@ -8,7 +8,7 @@ import requests
 from requests.exceptions import HTTPError
 
 from .exceptions import APIError
-from .models import Clan, TopClans, Player, Constants, Tag
+from .models import Clan, TopClans, Player, Constants, Tag, TopPlayers
 from .url import APIURL
 
 logger = logging.getLogger('__name__')
@@ -99,3 +99,9 @@ class Client:
         url = APIURL.constants
         data = self.fetch(url)
         return Constants(data)
+
+    def get_top_players(self):
+        """Fetch top players."""
+        url = APIURL.top_players
+        data = self.fetch(url)
+        return TopPlayers(data)

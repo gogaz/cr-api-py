@@ -44,6 +44,11 @@ class Player(BaseModel):
     def clan_role(self):
         return self.clan.role
 
+class TopPlayers(BaseModel):
+    """Top Players"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 
 class Constants(BaseModel):
     def __init__(self, *args, **kwargs):
