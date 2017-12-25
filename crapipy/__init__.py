@@ -7,3 +7,4 @@ from .client import Client
 from .client_async import AsyncClient
 from .exceptions import APITimeoutError, APIClientResponseError, APIError
 from .url import APIURL
+from .models import Clan, TopClans, TopPlayers, Tag

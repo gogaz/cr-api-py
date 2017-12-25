@@ -48,8 +48,6 @@ class Client:
             r = requests.get(url, headers=headers)
             data = r.json()
 
-            print(data)
-
             if r.status_code != 200:
                 logger.error(
                     "API Error | HTTP status {status} | url: {url}".format(
@@ -59,7 +57,9 @@ class Client:
                 )
                 raise APIError(**data)
 
-
+            if isinstance(data, dict):
+                if data.get('error'):
+                    raise APIError(**data)
 
         except (HTTPError, ConnectionError, json.JSONDecodeError):
             raise APIError
