@@ -78,7 +78,7 @@ def main():
     client = Client()
 
     # get player profile
-    player = client.get_profile('C0G20PR2')
+    player = client.get_player('C0G20PR2')
     assert player.name == 'SML'
     assert player.tag == 'C0G20PR2'
     assert player.clan.name == 'Reddit Delta'
@@ -124,7 +124,7 @@ async def main():
     client = AsyncClient()
 
     # get player profile
-    player = await client.get_profile('C0G20PR2')
+    player = await client.get_player('C0G20PR2')
     assert player.name == 'SML'
     assert player.tag == 'C0G20PR2'
     assert player.clan.name == 'Reddit Delta'
