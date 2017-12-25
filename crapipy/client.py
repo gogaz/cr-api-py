@@ -3,6 +3,7 @@ cr-api client for Clash Royale.
 """
 import json
 import logging
+import os
 
 import requests
 from requests.exceptions import HTTPError
@@ -25,8 +26,15 @@ class Client:
     API Client.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, token=None):
+        self._token = token
+
+    @property
+    def token(self):
+        """Load token from environment if not defined"""
+        if self._token is None:
+            self._token = os.environ['TOKEN']
+        return self._token
 
     def fetch(self, url):
         """Fetch URL.
@@ -35,8 +43,12 @@ class Client:
         :return: Response in JSON
 
         """
+        headers = {'auth': self.token}
         try:
-            r = requests.get(url)
+            r = requests.get(url, headers=headers)
+            data = r.json()
+
+            print(data)
 
             if r.status_code != 200:
                 logger.error(
@@ -45,9 +57,9 @@ class Client:
                         url=url
                     )
                 )
-                raise APIError
+                raise APIError(**data)
 
-            data = r.json()
+
 
         except (HTTPError, ConnectionError, json.JSONDecodeError):
             raise APIError
@@ -80,14 +92,14 @@ class Client:
         :return:
         """
         ptag = Tag(tag).tag
-        url = APIURL.profile.format(ptag)
+        url = APIURL.player.format(ptag)
         data = self.fetch(url)
         return Player(data)
 
     def get_profiles(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [Tag(tag).tag for tag in tags]
-        url = APIURL.profile.format(','.join(ptags))
+        url = APIURL.player.format(','.join(ptags))
         data = self.fetch(url)
         return [Player(d) for d in data]
 

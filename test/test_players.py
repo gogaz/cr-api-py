@@ -6,7 +6,7 @@ from crapipy import AsyncClient
 @pytest.mark.asyncio
 async def test_profiles():
     client = AsyncClient()
-    players = await client.get_profiles(['C0G20PR2', 'PY9VC98C'])
+    players = await client.get_players(['C0G20PR2', 'PY9VC98C'])
     assert players[0].name == 'SML'
     assert players[0].tag == 'C0G20PR2'
     assert players[0].clan.name == 'Reddit Delta'

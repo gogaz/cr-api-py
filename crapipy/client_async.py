@@ -4,6 +4,7 @@ cr-api async client for Clash Royale.
 import asyncio
 import json
 import logging
+import os
 
 import aiohttp
 
@@ -26,8 +27,15 @@ class AsyncClient:
     API AsyncClient.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, token=None):
+        self._token = token
+
+    @property
+    def token(self):
+        """Load token from environment if not defined"""
+        if self._token is None:
+            self._token = os.environ['TOKEN']
+        return self._token
 
     async def fetch(self, url):
         """Fetch URL.
@@ -35,9 +43,10 @@ class AsyncClient:
         :param url: URL
         :return: Response in JSON
         """
+        headers = {'auth': self.token}
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url) as resp:
+                async with session.get(url, headers=headers) as resp:
                     data = await resp.json()
                     if resp.status != 200:
                         logger.error(
@@ -47,7 +56,7 @@ class AsyncClient:
                                 url=url
                             )
                         )
-                        raise APIError
+                        raise APIError(**data)
 
         except (asyncio.TimeoutError, aiohttp.ClientResponseError, json.JSONDecodeError):
             raise APIError
@@ -76,20 +85,20 @@ class AsyncClient:
         data = await self.fetch(APIURL.top_clans)
         return make_box(data)
 
-    async def get_profile(self, tag: str) -> Player:
+    async def get_player(self, tag: str) -> Player:
         """Get player profile by tag.
         :param tag: 
         :return: 
         """
         ptag = Tag(tag).tag
-        url = APIURL.profile.format(ptag)
+        url = APIURL.player.format(ptag)
         data = await self.fetch(url)
         return Player(data)
 
-    async def get_profiles(self, tags):
+    async def get_players(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [Tag(tag).tag for tag in tags]
-        url = APIURL.profile.format(','.join(ptags))
+        url = APIURL.player.format(','.join(ptags))
         data = await self.fetch(url)
         return [Player(d) for d in data]
 
