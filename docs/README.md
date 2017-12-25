@@ -18,7 +18,7 @@ You can authenticate by either setting an environment variable called TOKEN or p
 
 ## How to use
 
-You can access data using blocking or async code. Internally, the wrapper uses the requests library for blocking code and the aiohttp library for async code.
+You can access data using blocking or async code. Internally, the wrapper uses the [requests](docs.python-requests.org) library for blocking code and the [aiohttp](aiohttp.readthedocs.io) library for async code.
 
 To initiate a client for connection:
 
