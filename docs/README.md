@@ -1,6 +1,6 @@
 # crapipy
 
-This is an async Python wrapper for [cr-api](http://github.com/cr-api/cr-api). See http://docs.cr-api.com for documentation on the expected fields.
+This is a Python wrapper (synchronous and asynchronous) for [cr-api](http://github.com/cr-api/cr-api). See http://docs.cr-api.com for documentation on the expected fields.
 
 ## Installation
 
