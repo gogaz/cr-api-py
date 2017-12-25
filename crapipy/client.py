@@ -86,7 +86,7 @@ class Client:
         data = self.fetch(APIURL.top_clans)
         return TopClans(data)
 
-    def get_profile(self, tag: str):
+    def get_player(self, tag: str):
         """Get player profile by tag.
         :param tag:
         :return:
@@ -96,7 +96,7 @@ class Client:
         data = self.fetch(url)
         return Player(data)
 
-    def get_profiles(self, tags):
+    def get_players(self, tags):
         """Fetch multiple players from profile API."""
         ptags = [Tag(tag).tag for tag in tags]
         url = APIURL.player.format(','.join(ptags))

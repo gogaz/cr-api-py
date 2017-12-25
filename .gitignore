@@ -1,6 +1,7 @@
 # PYPI
 .pypirc
 MANIFEST
+.cache
 
 # MacOS
 .DS_Store

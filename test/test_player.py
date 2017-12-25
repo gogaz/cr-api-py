@@ -24,7 +24,7 @@ async def test_profile_async():
 
 def test_profile():
     client = Client()
-    player = client.get_profile('C0G20PR2')
+    player = client.get_player('C0G20PR2')
     assert_player_model(player)
 
 
