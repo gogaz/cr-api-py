@@ -60,9 +60,9 @@ Additionally, you can use:
 
 ### get_clans(tags)
 
-### get_profile(tag)
+### get_player(tag)
 
-### get_profiles(tags)
+### get_players(tags)
 
 ### get_constants()
 
