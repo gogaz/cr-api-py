@@ -1,10 +1,21 @@
 """
 Data models
 """
-from box import Box
+from box import Box, BoxList
 
 
 class BaseModel(Box):
+    """
+    Base model.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.update({
+            "camel_killer_box": True,
+        })
+        super().__init__(*args, **kwargs)
+
+class BaseListModel(BoxList):
     """
     Base model.
     """
@@ -44,7 +55,7 @@ class Player(BaseModel):
     def clan_role(self):
         return self.clan.role
 
-class TopPlayers(BaseModel):
+class TopPlayers(BaseListModel):
     """Top Players"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
