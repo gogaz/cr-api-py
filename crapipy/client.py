@@ -33,7 +33,7 @@ class Client:
     def token(self):
         """Load token from environment if not defined"""
         if self._token is None:
-            self._token = os.environ['TOKEN']
+            self._token = os.environ.get('TOKEN')
         return self._token
 
     def fetch(self, url):
