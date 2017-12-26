@@ -34,13 +34,6 @@ class Clan(BaseModel):
         super().__init__(*args, **kwargs)
 
 
-class TopClans(BaseModel):
-    """Clan."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
 class Player(BaseModel):
     """Player profile."""
 
@@ -57,6 +50,11 @@ class Player(BaseModel):
 
 class TopPlayers(BaseListModel):
     """Top Players"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+class TopClans(BaseListModel):
+    """Top Clans."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

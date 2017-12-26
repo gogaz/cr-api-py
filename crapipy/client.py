@@ -81,11 +81,6 @@ class Client:
         data = self.fetch(url)
         return [Clan(d) for d in data]
 
-    def get_top_clans(self):
-        """Fetch top clans."""
-        data = self.fetch(APIURL.top_clans)
-        return TopClans(data)
-
     def get_player(self, tag: str):
         """Get player profile by tag.
         :param tag:
@@ -112,8 +107,14 @@ class Client:
         data = self.fetch(url)
         return Constants(data)
 
-    def get_top_players(self):
+    def get_top_players(self, location=''):
         """Fetch top players."""
-        url = APIURL.top_players
+        url = APIURL.top_players.format(location)
         data = self.fetch(url)
         return TopPlayers(data)
+
+    def get_top_clans(self, location=''):
+        """Fetch top clans."""
+        url = APIURL.top_clans.format(location)
+        data = self.fetch(url)
+        return TopClans(data)

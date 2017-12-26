@@ -9,7 +9,7 @@ import os
 import aiohttp
 
 from .exceptions import APIError
-from .models import Clan, Tag, Player, Constants, TopPlayers
+from .models import Clan, Tag, Player, Constants, TopPlayers, TopClans
 from .url import APIURL
 from .util import make_box
 
@@ -80,11 +80,6 @@ class AsyncClient:
         data = await self.fetch(url)
         return [Clan(d) for d in data]
 
-    async def get_top_clans(self):
-        """Fetch top clans."""
-        data = await self.fetch(APIURL.top_clans)
-        return make_box(data)
-
     async def get_player(self, tag: str) -> Player:
         """Get player profile by tag.
         :param tag: 
@@ -111,8 +106,14 @@ class AsyncClient:
         data = await self.fetch(url)
         return Constants(data)
 
-    async def get_top_players(self):
+    async def get_top_players(self, location=''):
         """Fetch top players."""
-        url = APIURL.top_players
+        url = APIURL.top_players.format(location)
         data = await self.fetch(url)
         return TopPlayers(data)
+
+    async def get_top_clans(self, location=''):
+        """Fetch top clans."""
+        url = APIURL.top_clans.format(location)
+        data = await self.fetch(url)
+        return TopClans(data)

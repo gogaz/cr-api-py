@@ -6,7 +6,7 @@ from crapipy import AsyncClient, Client
 def assert_player_model(player):
     assert player.name == 'SML'
     assert player.tag == 'C0G20PR2'
-    assert player.clan.name == 'Reddit Delta'
+    assert player.clan.name == 'Reddit Bravo'
     assert player.clan.role.lower() == 'leader'
     assert player.clan_name == player.clan.name
     assert player.clan_role == player.clan.role
