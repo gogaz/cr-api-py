@@ -9,9 +9,8 @@ import os
 import aiohttp
 
 from .exceptions import APIError
-from .models import Clan, Tag, Player, Constants, TopPlayers, TopClans
+from .models import Clan, Tag, Player, Constants, Players, Clans, Tournament, EndPoints
 from .url import APIURL
-from .util import make_box
 
 logger = logging.getLogger('__name__')
 logger.setLevel(logging.DEBUG)
@@ -37,7 +36,7 @@ class AsyncClient:
             self._token = os.environ.get('TOKEN')
         return self._token
 
-    async def fetch(self, url):
+    async def fetch(self, url, is_json=True):
         """Fetch URL.
 
         :param url: URL
@@ -47,7 +46,10 @@ class AsyncClient:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=headers) as resp:
-                    data = await resp.json()
+                    if is_json:
+                        data = await resp.json()
+                    else:
+                        data = await resp.text()
                     if resp.status != 200:
                         logger.error(
                             "API Error | HTTP status {status} | {errmsg} | url: {url}".format(
@@ -97,6 +99,12 @@ class AsyncClient:
         data = await self.fetch(url)
         return [Player(d) for d in data]
 
+    async def get_tournament(self, tag):
+        """Get tournament detail."""
+        url = APIURL.tournaments.format(tag)
+        data = await self.fetch(url)
+        return Tournament(data)
+
     async def get_constants(self, key=None):
         """Fetch contants.
 
@@ -110,10 +118,34 @@ class AsyncClient:
         """Fetch top players."""
         url = APIURL.top_players.format(location)
         data = await self.fetch(url)
-        return TopPlayers(data)
+        return Players(data)
 
     async def get_top_clans(self, location=''):
         """Fetch top clans."""
         url = APIURL.top_clans.format(location)
         data = await self.fetch(url)
-        return TopClans(data)
+        return Clans(data)
+
+    async def get_endpoints(self):
+        """Endpoints."""
+        url = APIURL.endpoints
+        data = await self.fetch(url)
+        return EndPoints(data)
+
+    async def get_version(self):
+        """API verision."""
+        url = APIURL.version
+        data = await self.fetch(url, is_json=False)
+        return data
+
+    async def get_popular_players(self):
+        """Fetch popular players."""
+        url = APIURL.popular_players
+        data = await self.fetch(url)
+        return Players(data)
+
+    async def get_popular_clans(self):
+        """Fetch popular players."""
+        url = APIURL.popular_clans
+        data = await self.fetch(url)
+        return Clans(data)

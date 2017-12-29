@@ -40,21 +40,23 @@ class Player(BaseModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @property
-    def clan_name(self):
-        return self.clan.name
+class Tournament(BaseModel):
+    """Tournament."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    @property
-    def clan_role(self):
-        return self.clan.role
-
-class TopPlayers(BaseListModel):
+class Players(BaseListModel):
     """Top Players"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-class TopClans(BaseListModel):
+class Clans(BaseListModel):
     """Top Clans."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+class EndPoints(BaseListModel):
+    """Endpoints."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
