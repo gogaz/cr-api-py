@@ -9,7 +9,7 @@ import os
 import aiohttp
 
 from .exceptions import APIError
-from .models import Clan, Tag, Player, Constants, Players, Clans, Tournament, EndPoints
+from .models import Clan, Tag, Player, Constants, Players, Clans, Tournament, EndPoints, Tournaments
 from .url import APIURL
 
 logger = logging.getLogger('__name__')
@@ -149,3 +149,9 @@ class AsyncClient:
         url = APIURL.popular_clans
         data = await self.fetch(url)
         return Clans(data)
+
+    async def get_popular_tournaments(self):
+        """Fetch popular tournaments."""
+        url = APIURL.popular_tournaments
+        data = await self.fetch(url)
+        return Tournaments(data)

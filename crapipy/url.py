@@ -12,3 +12,4 @@ class APIURL:
     version = 'http://api.cr-api.com/version'
     popular_players = 'http://api.cr-api.com/popular/players'
     popular_clans = 'http://api.cr-api.com/popular/clans'
+    popular_tournaments = 'http://api.cr-api.com/popular/tournaments'

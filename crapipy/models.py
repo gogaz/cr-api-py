@@ -60,6 +60,11 @@ class EndPoints(BaseListModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+class Tournaments(BaseListModel):
+    """Endpoints."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 
 class Constants(BaseModel):
     def __init__(self, *args, **kwargs):

@@ -9,7 +9,7 @@ import requests
 from requests.exceptions import HTTPError
 
 from .exceptions import APIError
-from .models import Clan, Clans, Player, Constants, Tag, Players, Tournament, EndPoints
+from .models import Clan, Clans, Player, Constants, Tag, Players, Tournament, EndPoints, Tournaments
 from .url import APIURL
 
 logger = logging.getLogger('__name__')
@@ -147,7 +147,13 @@ class Client:
         return Players(data)
 
     def get_popular_clans(self):
-        """Fetch popular players."""
+        """Fetch popular clans."""
         url = APIURL.popular_clans
         data = self.fetch(url)
         return Clans(data)
+
+    def get_popular_tournaments(self):
+        """Fetch popular tournaments."""
+        url = APIURL.popular_tournaments
+        data = self.fetch(url)
+        return Tournaments(data)

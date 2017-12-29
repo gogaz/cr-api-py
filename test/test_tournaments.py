@@ -5,7 +5,6 @@ from crapipy import AsyncClient, Client
 
 def assert_tournament_model(tournament):
     assert tournament.tag == '20LLGRLC'
-    assert tournament.type == 'passwordProtected'
     assert tournament.name == 'Reddit Alpha Clan Family'
     assert tournament.max_capacity == 50
     assert tournament.preparation_duration == 7200
